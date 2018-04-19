@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import requests
+import requests,time
 from store_json import store_json
 
 def firehol_level1():
@@ -17,7 +17,8 @@ def firehol_level1():
             'source':'iplists.firehol.org/files/firehol_level1.netset',
             'level':'CRITICAL',
             'fp':'unknown',
-            'status':'unknown'
+            'status':'unknown',
+            'date' : time.strftime('%Y-%m-%d',time.localtime(time.time()))
         }
     return ip_dict
 
