@@ -63,9 +63,9 @@ def int_ip_subnet(subnet_element):
 def ip_segment_match(segment,ip_es):
     ip_es_num = socket.ntohl(struct.unpack("I",socket.inet_aton(str(ip_es)))[0])
     num_iprange = int_ip_range(segment)
-    for ip_range in num_iprange:
+    for ip_es_num in num_iprange:
         # print ip_range[0], ip_range[1]
-        if ip_range[0] <= ip_es_num <=ip_range[1]:
+        if num_iprange[0] <= ip_es_num <= num_iprange[1]:
             return ip_es
     return False
 
