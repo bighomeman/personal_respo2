@@ -19,34 +19,39 @@ class ESclient(object):
             "query": {
               "bool": {
                 "must": [
-				  {
-                    "query_string":{
-                      "query" : "NOT dip:[192.168.0.0 TO 192.168.255.255]"
+                    {
+                        "query_string": {
+                            "query": "NOT dip:[192.168.0.0 TO 192.168.255.255]",
+                            "analyze_wildcard": True
+                        }
+                    },
+                    {
+                        "range": {
+                            "@timestamp": {
+                                "gte": gte,
+                                "lte": lte,
+                                "format": "yyyy-MM-dd HH:mm:ss",
+                                "time_zone":"+08:00"
+                            }
+                        }
                     }
-				  },
-                  {
-                    "range": {
-                      "@timestamp": {
-                        "gte": gte,
-                        "lte": lte,
-                        "format": "yyyy-MM-dd HH:mm:ss"
-                      }
-                    }
-                  }
                 ],
                 "must_not": []
               }
             },
+            "_source": {
+                "excludes": []
+            },
             "aggs": {
-              aggs_name: {
-                "terms": {
-                  "field": "dip",
-                  "size": size,
-                  "order": {
-                    "_count": "desc"
-                  }
+                "getDip": {
+                    "terms": {
+                        "field": aggs_name,
+                        "size": size,
+                        "order": {
+                            "_count": "desc"
+                        }
+                    }
                 }
-              }
             }
         }
 
@@ -54,7 +59,7 @@ class ESclient(object):
 			index=index,
 			body=search_option
 			)
-		clean_search_result = search_result['aggregations'][aggs_name]['buckets']
+		clean_search_result = search_result['aggregations']["getDip"]['buckets']
 		ip = []
 		for temp in clean_search_result:
 			ip.append(temp['key'])
@@ -101,27 +106,27 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch_result,seg
             doc = {}
             doc['level'] = dataset[fullmatch_result[i]]['level']
             doc['source'] = dataset[fullmatch_result[i]]['source']
-            doc['type'] = dataset[fullmatch_result[i]]['type']
+            doc['type'] = "full_match"
             doc[aggs_name] = dataset[fullmatch_result[i]]
             doc['@timestamp'] = timestamp
             doc['index'] = index
             es_insert.es_index(doc)
-        print 'full_match_get'
+        print 'full_match_insert'
 
     if len(segment_match) > 0:
         for i in range(len(segment_match)):
-            #i is dict{ip_es:ipseg}
-            ip_es=i.keys()[0]
-            ipseg=i[ip_es]
+            # segment insert
+            ip_es=segment_match[i].keys()[0]
+            ipseg=segment_match[i][ip_es]
             doc = {}
             doc['level'] = dataset[ipseg]['level']
             doc['source'] = dataset[ipseg]['source']
-            doc['type'] = dataset[ipseg]['type']
+            doc['type'] = ipseg
             doc[aggs_name] = ip_es
             doc['@timestamp'] = timestamp
             doc['index'] = index
             es_insert.es_index(doc)
-        print 'segment_match_get'
+        print 'segment_insert'
 
 
 '''

@@ -72,9 +72,15 @@ def int_ip_subnet(subnet):
         ip_int[ip_nm]={}
         avaliable_ip = subnet_range(ip_nm)
         ip_int_element = []
-        num_ip_A = socket.ntohl(struct.unpack("I",socket.inet_aton(avaliable_ip["firstadr"]))[0])
+        try:
+            num_ip_A = socket.ntohl(struct.unpack("I",socket.inet_aton(avaliable_ip["start"]))[0])
+        except Exception,e:
+            print e
         # print avaliable_ip[0],num_ip_A
-        num_ip_B = socket.ntohl(struct.unpack("I",socket.inet_aton(avaliable_ip["lastadr"]))[0])
+        try:
+            num_ip_B = socket.ntohl(struct.unpack("I",socket.inet_aton(avaliable_ip["end"]))[0])
+        except Exception,e:
+            print e
         # print avaliable_ip[1],num_ip_B
         ip_int[ip_nm]["start"]=num_ip_A
         ip_int[ip_nm]['end']=num_ip_B
@@ -89,7 +95,7 @@ def ip_segment_match(num_iprange, ip_es):
     ip_es_num = socket.ntohl(struct.unpack("I",socket.inet_aton(str(ip_es)))[0])
     for ip_range in num_iprange.keys():
         # print ip_range[0], ip_range[1]
-        if(int(num_iprange[ip_range]["start"])<=ip_es_num<=int(num_iprange[ip_range]["end"])):
+        if(long(num_iprange[ip_range]["start"])<=ip_es_num<=long(num_iprange[ip_range]["end"])):
             return {ip_es:ip_range}
         # if ip_range[0] <= ip_es_num <=ip_range[1]:
         #     return ip_es

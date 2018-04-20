@@ -40,12 +40,12 @@ def subnet_range(subnet):
         lastadr.append(str(ip_num[3] | (~ nm_num[3] & 0xff)))
         begin_addr = '.'.join(firstadr)
         end_addr = '.'.join(lastadr)
-        ip_range[firstadr]=begin_addr
-        ip_range[lastadr]=end_addr
+        ip_range["start"] = begin_addr
+        ip_range["end"] = end_addr
         # ip_range.append(begin_addr)
         # ip_range.append(end_addr)
 
-    if netMask == 32:
+    elif netMask == 32:
         firstadr.append(str(ip_num[0]))
         firstadr.append(str(ip_num[1]))
         firstadr.append(str(ip_num[2]))
@@ -55,19 +55,19 @@ def subnet_range(subnet):
         lastadr.append(str(ip_num[1]))
         lastadr.append(str(ip_num[2]))
         lastadr.append(str(ip_num[3]))
+    else:
+        lastadr.append(str(ip_num[0] | (~ nm_num[0] & 0xff)))
+        lastadr.append(str(ip_num[1] | (~ nm_num[1] & 0xff)))
+        lastadr.append(str(ip_num[2] | (~ nm_num[2] & 0xff)))
+        lastadr.append(str((ip_num[3] | (~ nm_num[3] & 0xff))-1))
 
-    lastadr.append(str(ip_num[0] | (~ nm_num[0] & 0xff)))
-    lastadr.append(str(ip_num[1] | (~ nm_num[1] & 0xff)))
-    lastadr.append(str(ip_num[2] | (~ nm_num[2] & 0xff)))
-    lastadr.append(str((ip_num[3] | (~ nm_num[3] & 0xff))-1))
-
-    firstadr.append(str(ip_num[0] & nm_num[0]    ))
-    firstadr.append(str(ip_num[1] & nm_num[1]    ))
-    firstadr.append(str(ip_num[2] & nm_num[2]    ))
-    firstadr.append(str((ip_num[3] & nm_num[3])+1))
-    begin_addr = '.'.join(firstadr)
-    end_addr = '.'.join(lastadr)
-    ip_range[firstadr] = begin_addr
-    ip_range[lastadr] = end_addr
+        firstadr.append(str(ip_num[0] & nm_num[0]    ))
+        firstadr.append(str(ip_num[1] & nm_num[1]    ))
+        firstadr.append(str(ip_num[2] & nm_num[2]    ))
+        firstadr.append(str((ip_num[3] & nm_num[3])+1))
+        begin_addr = '.'.join(firstadr)
+        end_addr = '.'.join(lastadr)
+        ip_range["start"] = begin_addr
+        ip_range["end"] = end_addr
 
     return ip_range

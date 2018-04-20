@@ -114,7 +114,7 @@ def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
         try:
             st=time.clock()
             #update source dataset
-            # update_blacklist.main(tday,flgnum)
+            update_blacklist.main(tday,flgnum)
             #check interval time is 15mins
             checkES(startTime,indx,aggs_name,serverNum,dport,tday)
             startTime = startTime + delta
@@ -125,8 +125,8 @@ def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
 
 
 if __name__=="__main__":
-    # entertime = datetime.datetime.now()
-    entertime=datetime.datetime.strptime("2018-04-20 12:10:00",'%Y-%m-%d %H:%M:%S')
+    entertime = datetime.datetime.now()
+    # entertime=datetime.datetime.strptime("2018-04-20 15:30:00",'%Y-%m-%d %H:%M:%S')
     #delta = 5mins
     delta=parser_config.getCheckDeltatime()
     serverNum,dport,indx,aggs_name=parser_config.get_ES_info()
