@@ -106,10 +106,9 @@ def load_dict(filedir):
 	try:
 		with open(filedir,'r') as f:
 			dict1=json.loads(f.read())
-			return dict1
 	except IOError:
 		print 'Error'
-
+	return dict1
 
 def insert(Trie,element):
 	'''
@@ -130,3 +129,4 @@ def create_Trie(blacklist):
 	for domain in blacklist:
 		domainTrie=insert(domainTrie,domain)
 	return domainTrie
+

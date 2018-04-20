@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os, parser_config
+import os
 import time
 import datetime
 
@@ -36,5 +36,7 @@ def run(entertime,delta):
             print e
 
 if __name__=="__main__":
-    frequency = parser_config.match_period()
-    run(frequency[0],frequency[1])
+    entertime = '2018-03-28 10:00:00'
+    delta = minutes_5
+    run(entertime,delta)
+    # store_run()

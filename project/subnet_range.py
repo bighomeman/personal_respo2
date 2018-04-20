@@ -19,7 +19,7 @@ def subnet_to_binary(num):
                 nm_num.append(int(ip_pot))
     return nm_num
 
-#ip is string for xxx.xxx.xxx.xxx, subnet is number
+#ip is string for single xxx.xxx.xxx.xxx/XX, subnet is number
 def subnet_range(subnet):
     subnet_split = subnet.split('/')
     ip_num = ip_split_num(subnet_split[0])
@@ -27,7 +27,7 @@ def subnet_range(subnet):
     nm_num = subnet_to_binary(netMask)
     firstadr = []
     lastadr = []
-    ip_range = []
+    ip_range = {}
     if netMask == 31:
         firstadr.append(str(ip_num[0] & nm_num[0]))
         firstadr.append(str(ip_num[1] & nm_num[1]))
@@ -40,8 +40,10 @@ def subnet_range(subnet):
         lastadr.append(str(ip_num[3] | (~ nm_num[3] & 0xff)))
         begin_addr = '.'.join(firstadr)
         end_addr = '.'.join(lastadr)
-        ip_range.append(begin_addr)
-        ip_range.append(end_addr)
+        ip_range[firstadr]=begin_addr
+        ip_range[lastadr]=end_addr
+        # ip_range.append(begin_addr)
+        # ip_range.append(end_addr)
 
     if netMask == 32:
         firstadr.append(str(ip_num[0]))
@@ -63,9 +65,9 @@ def subnet_range(subnet):
     firstadr.append(str(ip_num[1] & nm_num[1]    ))
     firstadr.append(str(ip_num[2] & nm_num[2]    ))
     firstadr.append(str((ip_num[3] & nm_num[3])+1))
-    firstadr_str = '.'.join(firstadr)
-    lastadr_str = '.'.join(lastadr)
-    ip_range.append(firstadr_str)
-    ip_range.append(lastadr_str)
+    begin_addr = '.'.join(firstadr)
+    end_addr = '.'.join(lastadr)
+    ip_range[firstadr] = begin_addr
+    ip_range[lastadr] = end_addr
 
     return ip_range

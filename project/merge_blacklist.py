@@ -4,14 +4,11 @@ from blacklist_tools import *
 sys.dont_write_bytecode = True
 import  treat_ip
 
-
-
 # 存储原始数据
 def get_blacklist_module():
     parse_blacklist = parser_config.get_func()
-    module_path =parser_config.get_module_path()
     for file_name in parse_blacklist:
-         command = 'python ' + module_path[0] + file_name +'.py'
+         command = 'python .\get_blacklist\\' + file_name +'.py'
          try:
               status = os.system(command)
               print status
@@ -36,6 +33,7 @@ def merge_blacklist(dir,date,name):
         if os.path.exists(file_name+'.json'):
             os.remove(file_name+'.json')
 
+#建Trie树
 
 def get_resource(date):
     source_store_path =parser_config.get_store_path()

@@ -1,5 +1,5 @@
 import ConfigParser
-import re,datetime,time
+import re,datetime
 
 cp = ConfigParser.ConfigParser()
 cp.read("blacklist_match.conf")
@@ -7,61 +7,71 @@ section = cp.sections()
 # print section
 def get_func():
     parse_blacklist_key = cp.options(section[0])
-    # print parse_blacklist_key
     #function module
     moudle_func = cp.get("parse_blacklist", parse_blacklist_key[0])
     moudle_list = moudle_func.split(',')
     # print moudle_list
-    moudle_name = []
+    moudle_name = {}
     for temp in moudle_list:
-        temp = temp.strip()
-        moudle_name.append(temp)
+        fname,ftimes=temp.split(":")
+        fname = fname.strip()
+        # as a dict: key is filename,value is the update frequency
+        moudle_name[fname]=ftimes
     return moudle_name
 
 def get_store_path():
     #source_data_path
-    source_store_path_key = cp.options(section[1])
-    # print source_store_path_key
+    source_store_path_key = cp.options('source_store_path')
     source_store_path = []
     for temp in source_store_path_key:
         source_store_path.append(cp.get('source_store_path', temp))
     return source_store_path
 
+
+def get_ES_info():
+    # ES information
+    source_store_path_key=cp.options("ES_info")
+    #value=cp.get(sectionName,keyword)
+    server=cp.get('ES_info',source_store_path_key[0])
+    dport=cp.get('ES_info',source_store_path_key[1])
+    indx=cp.get('ES_info',source_store_path_key[2])
+    aggs_name=cp.get('ES_info',source_store_path_key[3])
+    return server,dport,indx,aggs_name
+
+def getCheckDeltatime():
+    #check frequency
+    timekey=cp.options("delta_time_check")
+    times=cp.getint("delta_time_check",timekey[0])
+    deltatime=datetime.timedelta(minutes=times)
+    return deltatime
+
 def get_module_path():
     #source_data_path
-    module_path_key = cp.options(section[2])
+    module_path_key = cp.options('blacklist_moudle_path')
     # print module_path_key
     module_path = []
     for temp in module_path_key:
         module_path.append(cp.get('blacklist_moudle_path', temp))
     return module_path
-
+# print cp.sections
+#cun period
 #############################################################################################################################
-
-
+# frequency_key = cp.options(sections[3])
+# frequency = []
+# for temp in frequency_key:
+#     frequency.append(cp.get('frequency', temp))
 #
 # # print frequency
-
-def match_period():
-    frequency_key = cp.options(section[3])
-    frequency = []
-    for temp in frequency_key:
-        frequency.append(cp.get('frequency', temp))
-    regex1=re.compile(r'\d+')
-    regex2=re.compile(r'[a-zA-Z]+')
-    period_num = regex1.findall(frequency[1])[0]
-    period_scale = regex2.findall(frequency[1])[0]
-
-    if frequency[0] == 'now':
-	frequency[0] = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())) 
-
-    period = []
-    period.append(frequency[0])
-    if period_scale == 's'or period_scale == 'S':
-        period.append(datetime.timedelta(seconds = int(period_num)))
-    elif period_scale == 'm'or period_scale == 'M':
-        period.append(datetime.timedelta(minutes = int(period_num)))
-    elif period_scale == 'd' or period_scale == 'D':
-        period.append(datetime.timedelta(days = int(period_num)))
-    return period
+# regex1=re.compile(r'\d+')
+# regex2=re.compile(r'[a-zA-Z]+')
+# period_num = regex1.findall(frequency[1])[0]
+# period_scale = regex2.findall(frequency[1])[0]
+# def export_period():
+#     if period_scale == 's'or period_scale == 'S' :
+#         period  = datetime.timedelta(seconds = int(period_num))
+#     elif period_scale == 'm'or period_scale == 'M':
+#         period = datetime.timedelta(minutes = int(period_num))
+#     elif period_scale == 'd' or period_scale == 'D':
+#         period = datetime.timedelta(days = int(period_num))
+#     return period
 #############################################################################################################################

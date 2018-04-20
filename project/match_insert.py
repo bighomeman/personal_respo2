@@ -5,7 +5,9 @@ from elasticsearch import Elasticsearch
 import json
 import datetime,sys
 from blacklist_tools import load_dict
-import treat_ip,parser_config
+import treat_ip
+import parser_config
+import os
 
 class ESclient(object):
 	def __init__(self,server='192.168.0.122',port='9222'):
@@ -34,9 +36,6 @@ class ESclient(object):
                 ],
                 "must_not": []
               }
-            },
-            "_source": {
-              "excludes": []
             },
             "aggs": {
               aggs_name: {
@@ -72,86 +71,81 @@ class ESclient(object):
 			)
 
 
+def get_all_file(path):
+    if(os.path.exists(path)):
+        filelist=os.listdir(path)
+        return filelist
 
+def treatip(dataset,es_ip):
+    full,segment,subnet=treat_ip.seperate_ip(dataset)
+    # match procedure
+    full_list = full.keys()
+    fullmatch_result = treat_ip.ip_full_match(full_list, es_ip)
+    # print fullmatch_result
+    fullmatchlist=list(fullmatch_result)
+    segment_match = []
+    segmentlist=treat_ip.int_ip_range(segment)
+    subnetlist=treat_ip.int_ip_subnet(subnet)
+    for ip_str in es_ip:
+        if treat_ip.ip_segment_match(segmentlist, ip_str):
+            segment_match.append(treat_ip.ip_segment_match(segmentlist, ip_str))
+        elif treat_ip.ip_segment_match(subnetlist, ip_str):
+            segment_match.append(treat_ip.ip_segment_match(subnetlist, ip_str))
+    # print segment_match
+    return fullmatchlist,segment_match
 
-
-def main(index, gte, lte, aggs_name, timestamp):
-    time=lte.split(" ")
-    source_store_path =parser_config.get_store_path()
-    segment_dict = load_dict(source_store_path[1] + "segment-"+str(time[0])+".json")
-    # print segment_dict
-    full_match_dict = load_dict(source_store_path[1] + "full_match-"+str(time[0])+".json")
-    # print full_match_dict
-    subnet_dict = load_dict(source_store_path[1] + "subnet-"+str(time[0])+".json")
-    # print subnet_dict
-    es = ESclient(server = '192.168.0.122')
-    ip_es_list = es.get_es_ip(index,gte,lte,aggs_name)
-    # print ip_es_list
-    full_list = full_match_dict.keys()
-
-    fullmatch_result = treat_ip.ip_full_match(full_list,ip_es_list)
-
-
-
-    segment_match_ip = []
-    segment_match_dict = []
-    for ip_str in ip_es_list:
-        for segment_element in segment_dict:
-            if treat_ip.ip_segment_match(segment_element,ip_str):
-                segment_match_ip.append(ip_str)
-                segment_match_dict.append(segment_element)
-
-
-    subnet_match_ip = []
-    subnet_match_dict = []
-    for ip_str in ip_es_list:
-
-        for subnet_element in subnet_dict:
-            if treat_ip.ip_subnet_match(subnet_element,ip_str):
-                subnet_match_ip.append(ip_str)
-                subnet_match_dict.append(subnet_element)
-
-
-    es_insert = ESclient(server = '192.168.0.122', port = '9400')
-    fullmatch_result = list(fullmatch_result)
+def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch_result,segment_match,dataset):
+    es_insert = ESclient(server=serverNum, port=dport)
     if len(fullmatch_result) > 0:
-        print 'fullmatch_result',fullmatch_result,index
         for i in range(len(fullmatch_result)):
             doc = {}
-            doc[aggs_name] = fullmatch_result[i]
+            doc['level'] = dataset[fullmatch_result[i]]['level']
+            doc['source'] = dataset[fullmatch_result[i]]['source']
+            doc['type'] = dataset[fullmatch_result[i]]['type']
+            doc[aggs_name] = dataset[fullmatch_result[i]]
             doc['@timestamp'] = timestamp
             doc['index'] = index
-            doc['level'] = full_match_dict[fullmatch_result[i]]['level']
-            doc['source'] = full_match_dict[fullmatch_result[i]]['source']
-            doc['type'] = full_match_dict[fullmatch_result[i]]['type']
             es_insert.es_index(doc)
         print 'full_match_get'
 
-    if len(segment_match_ip) > 0:
-        print 'segment_match_ip',segment_match_ip,index, segment_match_dict
-        for i in range(len(segment_match_ip)):
+    if len(segment_match) > 0:
+        for i in range(len(segment_match)):
+            #i is dict{ip_es:ipseg}
+            ip_es=i.keys()[0]
+            ipseg=i[ip_es]
             doc = {}
-            doc[aggs_name] = segment_match_ip[i]
+            doc['level'] = dataset[ipseg]['level']
+            doc['source'] = dataset[ipseg]['source']
+            doc['type'] = dataset[ipseg]['type']
+            doc[aggs_name] = ip_es
             doc['@timestamp'] = timestamp
             doc['index'] = index
-            doc['level'] = segment_match_dict[i]['level']
-            doc['source'] = segment_match_dict[i]['source']
-            doc['type'] = segment_match_dict[i]['type']
             es_insert.es_index(doc)
         print 'segment_match_get'
 
-    if len(subnet_match_ip) > 0:
-        print 'subnet_match_ip',subnet_match_ip,index,subnet_match_dict
-        for i in range(len(subnet_match_ip)):
-            doc = {}
-            doc[aggs_name] = subnet_match_ip[i]
-            doc['@timestamp'] = timestamp
-            doc['index'] = index
-            doc['level'] = subnet_match_dict[i]['level']
-            doc['source'] = subnet_match_dict[i]['source']
-            doc['type'] = subnet_match_dict[i]['type']
-            es_insert.es_index(doc)
-        print 'segment_match_get'
+
+'''
+step1: get the saved file
+step2: divide the data into 3 parts(ip_32/ip_seg/ip_subnet)
+step3: match each parts
+step4: insert the threat info into es
+'''
+def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
+    path=parser_config.get_store_path()[1]+str(tday)+'\\'
+    filelist=get_all_file(path)
+    #get es list
+    es = ESclient(server =serverNum,port=dport)
+    ip_es_list = es.get_es_ip(index,gte,lte,aggs_name)
+
+    #check each file
+    for fname in filelist:
+        fpath=path+fname
+        dataset=load_dict(fpath)
+        #get match result
+        fullmatch,segmentmatch=treatip(dataset,ip_es_list)
+        insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,dataset)
+
+
 
 if __name__ == '__main__':
 	main('tcp-*',sys.argv[1],sys.argv[2],'dip',sys.argv[3])

@@ -7,7 +7,7 @@ import datetime
 
 second = datetime.timedelta(seconds=1)
 day = datetime.timedelta(days=1)
-hour = datetime.timedelta(hours=1)
+
 def store_run():
     entertime = time.strftime("%Y-%m-%d %H:%M:%S")
     startTime = datetime.datetime.strptime(entertime, '%Y-%m-%d %H:%M:%S')
@@ -29,7 +29,7 @@ def store_run():
             status = os.system(command)
             print('done'+"-"*100),time.ctime()
             print("Command status = %s."%status)
-            startTime = startTime+hour
+            startTime = startTime+day
         except Exception, e:
             print e
 
