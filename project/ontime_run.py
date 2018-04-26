@@ -4,7 +4,6 @@
 import os
 import time
 import datetime
-import merge_blacklist
 import match_insert
 import parser_config
 import update_blacklist
@@ -75,24 +74,11 @@ def checkES(startTime,indx,aggs_name,serverNum,dport,tday):
         timestamp = (startTime).strftime('%Y-%m-%dT%H:%M:%S') + ".000+08:00"
         match_insert.main(tday,indx,gte,lte,aggs_name,timestamp,serverNum,dport)
         print("check finish."), time.ctime()
+        print"="*40
 
     except Exception, e:
         print e
 
-
-def mergeData(tday,flgnum):
-    # new merge function
-    try:
-        print("Starting merge command."), time.ctime()
-        # execute the command
-        storeDate = tday
-        merge_blacklist.main(storeDate,flgnum)
-        # command = r'python merge_blacklist.py "%s"' %d % (storeDate,flgnum)
-        # status = os.system(command)
-        # print('done' + "-" * 100), time.ctime()
-        # print("Command status = %s." % status)
-    except Exception, e:
-        print e
 
 
 def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
@@ -109,13 +95,13 @@ def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
             flgnum=0 # reset flgnum per day
             tday=datetime.datetime.now().date()
         while datetime.datetime.now() < startTime:
-            print('time sleep')
+            print('time sleep...')
             time.sleep(delta.seconds-runtime)
         try:
             st=time.clock()
             #update source dataset
             update_blacklist.main(tday,flgnum)
-            #check interval time is 15mins
+            # check interval time is 15mins
             checkES(startTime,indx,aggs_name,serverNum,dport,tday)
             startTime = startTime + delta
             flgnum+=1
@@ -125,10 +111,10 @@ def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
 
 
 if __name__=="__main__":
-    entertime = datetime.datetime.now()
-    # entertime=datetime.datetime.strptime("2018-04-20 15:30:00",'%Y-%m-%d %H:%M:%S')
     #delta = 5mins
-    delta=parser_config.getCheckDeltatime()
+    delta,starttime=parser_config.getCheckDeltatime()
+    # entertime = datetime.datetime.now()
+    entertime=datetime.datetime.strptime(starttime,'%Y-%m-%d %H:%M:%S')
     serverNum,dport,indx,aggs_name=parser_config.get_ES_info()
     #serverNum='172.23.2.96',dport = "9200";indx=tcp-*; aggs_name=dip
     new_run(entertime,delta,serverNum,dport,indx,aggs_name)

@@ -6,7 +6,7 @@ cp.read("blacklist_match.conf")
 section = cp.sections()
 # print section
 def get_func():
-    parse_blacklist_key = cp.options(section[0])
+    parse_blacklist_key = cp.options("parse_blacklist")
     #function module
     moudle_func = cp.get("parse_blacklist", parse_blacklist_key[0])
     moudle_list = moudle_func.split(',')
@@ -40,10 +40,12 @@ def get_ES_info():
 
 def getCheckDeltatime():
     #check frequency
-    timekey=cp.options("delta_time_check")
-    times=cp.getint("delta_time_check",timekey[0])
+    timekey1=cp.options("delta_time_check")
+    times=cp.getint("delta_time_check",timekey1[0])
     deltatime=datetime.timedelta(minutes=times)
-    return deltatime
+    timekey2=cp.options("frequency")
+    starttime=cp.get("frequency",timekey2[0])
+    return deltatime,starttime
 
 def get_module_path():
     #source_data_path

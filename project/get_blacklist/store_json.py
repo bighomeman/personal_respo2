@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
 import datetime
-import project.parser_config
-
+import sys,os
+sys.path.append('..')
+from project import parser_config
 
 def store_json(dict,name):
 	'''
@@ -10,7 +11,7 @@ def store_json(dict,name):
 	'''
 	tday = datetime.datetime.now().date()
 	file_name = name+ '.json'
-	savepath=project.parser_config.get_store_path()[1]+str(tday)+'\\'+file_name
+	savepath=parser_config.get_store_path()[1]+str(tday)+os.path.sep+file_name
 
 	try:
 		with open(savepath,'w') as f:

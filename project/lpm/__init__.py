@@ -5,7 +5,12 @@ __version__ = "0.1"
 from ctypes import *
 import os
 
-lib_lpm = cdll.LoadLibrary(os.getcwd()+'/lpm/lpm.so')
+# linux :
+#cdll.LoadLibrary(os.getcwd()+'/lpm/lpm.so')
+#windows
+print os.getcwd()
+# lib_lpm = cdll.LoadLibrary(os.getcwd()+'\lpm\lpm.so')
+lib_lpm = cdll.LoadLibrary(os.getcwd()+os.path.sep+'lpm'+os.path.sep+'lpm.so')
 
 def init():
     lib_lpm.lpm_init_rule()

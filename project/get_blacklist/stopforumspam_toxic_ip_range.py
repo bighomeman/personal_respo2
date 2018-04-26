@@ -25,7 +25,10 @@ def stopforumspam_toxic_ip_range():
         # print ip_dict
     return ip_dict
 
-if __name__=="__main__":
+def main():
     dict = stopforumspam_toxic_ip_range()
     print len(dict)
-    store_json(dict,'stopforumspam_toxic_ip_range')
+    store_json(dict, 'stopforumspam_toxic_ip_range')
+
+if __name__=="__main__":
+    main()

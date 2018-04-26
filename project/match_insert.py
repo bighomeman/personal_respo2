@@ -8,6 +8,7 @@ from blacklist_tools import load_dict
 import treat_ip
 import parser_config
 import os
+import lpm
 
 class ESclient(object):
 	def __init__(self,server='192.168.0.122',port='9222'):
@@ -88,36 +89,29 @@ def treatip(dataset,es_ip):
     fullmatch_result = treat_ip.ip_full_match(full_list, es_ip)
     # print fullmatch_result
     fullmatchlist=list(fullmatch_result)
-    segment_match = []
-    segmentlist=treat_ip.int_ip_range(segment)
-    subnetlist=treat_ip.int_ip_subnet(subnet)
-    for ip_str in es_ip:
-        if treat_ip.ip_segment_match(segmentlist, ip_str):
-            segment_match.append(treat_ip.ip_segment_match(segmentlist, ip_str))
-        elif treat_ip.ip_segment_match(subnetlist, ip_str):
-            segment_match.append(treat_ip.ip_segment_match(subnetlist, ip_str))
-    # print segment_match
-    return fullmatchlist,segment_match
+    segmentlist,subnetlist,msg=treat_ip.int_ip_range(segment,subnet,es_ip)
 
-def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch_result,segment_match,dataset):
+    return fullmatchlist,segmentlist,subnetlist,msg
+
+def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetmatch,dataset,msg):
     es_insert = ESclient(server=serverNum, port=dport)
-    if len(fullmatch_result) > 0:
-        for i in range(len(fullmatch_result)):
+    if len(fullmatch) > 0:
+        for i in range(len(fullmatch)):
             doc = {}
-            doc['level'] = dataset[fullmatch_result[i]]['level']
-            doc['source'] = dataset[fullmatch_result[i]]['source']
+            doc['level'] = dataset[fullmatch[i]]['level']
+            doc['source'] = dataset[fullmatch[i]]['source']
             doc['type'] = "full_match"
-            doc[aggs_name] = dataset[fullmatch_result[i]]
+            doc[aggs_name] = fullmatch[i]
             doc['@timestamp'] = timestamp
             doc['index'] = index
             es_insert.es_index(doc)
         print 'full_match_insert'
 
-    if len(segment_match) > 0:
-        for i in range(len(segment_match)):
+    if len(segmentmatch) > 0:
+        for i in range(len(segmentmatch)):
             # segment insert
-            ip_es=segment_match[i].keys()[0]
-            ipseg=segment_match[i][ip_es]
+            ip_es=segmentmatch[i].keys()[0]
+            ipseg=segmentmatch[i][ip_es]
             doc = {}
             doc['level'] = dataset[ipseg]['level']
             doc['source'] = dataset[ipseg]['source']
@@ -128,6 +122,21 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch_result,seg
             es_insert.es_index(doc)
         print 'segment_insert'
 
+    if len(subnetmatch) > 0:
+        for i in range(len(subnetmatch)):
+            # segment insert
+            ip_es=subnetmatch[i].keys()[0]
+            ipseg=subnetmatch[i][ip_es]
+            doc = {}
+            doc['level'] = msg['level']
+            doc['source'] = msg['source']
+            doc['type'] = ipseg
+            doc[aggs_name] = ip_es
+            doc['@timestamp'] = timestamp
+            doc['index'] = index
+            es_insert.es_index(doc)
+        print 'subnet_insert'
+
 
 '''
 step1: get the saved file
@@ -136,7 +145,7 @@ step3: match each parts
 step4: insert the threat info into es
 '''
 def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
-    path=parser_config.get_store_path()[1]+str(tday)+'\\'
+    path=parser_config.get_store_path()[1]+str(tday)+os.path.sep
     filelist=get_all_file(path)
     #get es list
     es = ESclient(server =serverNum,port=dport)
@@ -147,8 +156,8 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
         fpath=path+fname
         dataset=load_dict(fpath)
         #get match result
-        fullmatch,segmentmatch=treatip(dataset,ip_es_list)
-        insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,dataset)
+        fullmatch,segmentmatch,subnetmatch,msg=treatip(dataset,ip_es_list)
+        insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetmatch,dataset,msg)
 
 
 

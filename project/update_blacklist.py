@@ -18,16 +18,19 @@ def update_blacklist_module(flgnum):
         times=int(parser_blacklist[filename])
         # check the update frequency
         if(flgnum%times==0):
-            command='python .\get_blacklist\\'+filename+'.py'
+            # command='python %s'%fpath
             try:
-                status=os.system(command)
-                print status
+                df = __import__('get_blacklist.{}'.format(filename), fromlist=True)
+                df.main()
+                # status=os.system(command)
+                # print status
             except Exception,e:
                 print e
 
 def main(tday,flgnum):
     print("Starting update command."), time.ctime()
-    dirpath=".\data\\%s\\"%tday
+    # dirpath=".\data\\%s\\"%tday
+    dirpath=parser_config.get_store_path()[1]+str(tday)+os.path.sep
     if(not os.path.exists(dirpath)):
         os.mkdir(dirpath)
     update_blacklist_module(flgnum)

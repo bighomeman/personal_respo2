@@ -22,7 +22,10 @@ def firehol_level1():
         }
     return ip_dict
 
-if __name__=="__main__":
+def main():
     dict = firehol_level1()
     print len(dict.keys())
-    store_json(dict,'firehol_level1')
+    store_json(dict, 'firehol_level1')
+
+if __name__=="__main__":
+    main()

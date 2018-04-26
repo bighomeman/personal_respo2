@@ -6,6 +6,7 @@ from store_json import store_json
 
 
 def bitnodes():
+    requests.adapters.DEFAULT_RETRIES = 5
     http = requests.get('https://bitnodes.earn.com/api/v1/snapshots/latest/')
     neir = http.text
     neir_json = json.loads(neir)
@@ -33,7 +34,10 @@ def timestamp_datetime(value):
     dt = time.strftime(format, value)
     return dt
 
-if __name__=="__main__":
+def main():
     dict = bitnodes()
     print len(dict.keys())
-    store_json(dict,'bitnodes')
+    store_json(dict, 'bitnodes')
+
+if __name__=="__main__":
+    main()

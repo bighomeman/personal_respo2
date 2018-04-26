@@ -19,7 +19,7 @@ def MiningServerIPList():
     for ip in result:
         ip_dict[ip] ={
             'type':'mining pool',
-            'source':'bitnodes.earn.com/api/v1/snapshots/latest/',
+            'source':'github.com/ZeroDot1/CoinBlockerLists/blob/master/MiningServerIPList',
             'level':'CRITICAL',
             'fp':'unknown',
             'status':'unknown',
@@ -27,7 +27,10 @@ def MiningServerIPList():
         }
     return ip_dict
 
-if __name__=="__main__":
+def main():
     dict = MiningServerIPList()
     print len(dict.keys())
-    store_json(dict,'MiningServerIPList')
+    store_json(dict, 'MiningServerIPList')
+
+if __name__=="__main__":
+    main()
