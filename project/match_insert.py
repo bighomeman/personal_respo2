@@ -105,10 +105,10 @@ def treatip(dataset,es_ip):
     flg_lpm,flg_full=parser_config.get_method()
     if(1==flg_lpm):
         # subnet match by lpm
-        subnet_lpm,snlist=subnet_range.subnet_lpm(subnet,es_ip)
+        subnet_lpm,sndict=subnet_range.subnet_lpm(subnet,es_ip)
     if(1==flg_full):
         #subnet match by zhou, parameters are snlist and es_ip
-        subnet_full=subnet_range.subnet_range(snlist.es_ip)
+        subnet_full=subnet_range.subnet_range(sndict.es_ip)
 
     return fullmatchlist,segmentlist,subnet_lpm,subnet_full
 

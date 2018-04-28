@@ -39,7 +39,7 @@ def subnet_to_binary(num):
 #ip is string for single xxx.xxx.xxx.xxx/XX, subnet is number
 def subnet_lpm(subnet,es_ip):
     lpm.init()
-    snlist = {}
+    sndict = {}
     fpath = parser_config.get_store_path()[1]
     sn_lte16 = {}
     ip_subnet=subnet.keys()
@@ -90,9 +90,9 @@ def subnet_lpm(subnet,es_ip):
             lpm.insert_rule(ipstr1)
         else:
             #netMask>16 and not in [16,3,24,25],save them
-            snlist[sn]=subnet[sn]
+            sndict[sn]=subnet[sn]
 
-    saveToJSON(snlist, fpath,"remain_subnet")
+    saveToJSON(sndict, fpath,"remain_subnet")
     saveToJSON(sn_lte16,fpath,'lte16_subnet')
     #match
     subnet_result=[]
@@ -100,7 +100,7 @@ def subnet_lpm(subnet,es_ip):
         ip_es_num = socket.ntohl(struct.unpack("I", socket.inet_aton(str(ips)))[0])
         if(lpm.search_ip(ip_es_num)):
             subnet_result.append({ips:'subnet_lpm'})
-    return subnet_result,snlist
+    return subnet_result,sndict
 
 def subnet_range(subnet,es_ip):
     pass
