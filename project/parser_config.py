@@ -60,8 +60,8 @@ def get_method():
     # get subnet method
     source_store_path_key = cp.options("subnet_methods")
     # value=cp.get(sectionName,keyword)
-    flg_lpm = cp.getint('ES_info', source_store_path_key[0])
-    flg_full = cp.getint('ES_info', source_store_path_key[1])
+    flg_lpm = cp.getint('subnet_methods', source_store_path_key[0])
+    flg_full = cp.getint('subnet_methods', source_store_path_key[1])
     return flg_lpm,flg_full
 # print cp.sections
 #cun period
