@@ -9,6 +9,7 @@ import treat_ip
 import parser_config
 import os
 import lpm
+import subnet_range
 
 class ESclient(object):
 	def __init__(self,server='192.168.0.122',port='9222'):
@@ -82,24 +83,45 @@ def get_all_file(path):
         filelist=os.listdir(path)
         return filelist
 
+'''
+step1: get dataset from file and separate them into three parts
+step2: full match
+step3: range match
+step4: separate the subnet dataset into two parts(lpm,full)
+step5: lpm match and subnet full match
+'''
 def treatip(dataset,es_ip):
-    full,segment,subnet=treat_ip.seperate_ip(dataset)
+    full,segment,subnet=treat_ip.separate_ip(dataset)
     # match procedure
+    # full match
     full_list = full.keys()
-    fullmatch_result = treat_ip.ip_full_match(full_list, es_ip)
-    # print fullmatch_result
-    fullmatchlist=list(fullmatch_result)
-    segmentlist,subnetlist,msg=treat_ip.int_ip_range(segment,subnet,es_ip)
+    # return fullmatchlist
+    fullmatchlist=treat_ip.ip_full_match(full_list, es_ip)
+    # segment match, segmentlist:[{},{},...]
+    segmentlist=treat_ip.int_ip_range(segment,es_ip)
+    subnet_lpm={}
+    subnet_full={}
+    # read conf file to choose the methods
+    flg_lpm,flg_full=parser_config.get_method()
+    if(1==flg_lpm):
+        # subnet match by lpm
+        subnet_lpm,snlist=subnet_range.subnet_lpm(subnet,es_ip)
+    if(1==flg_full):
+        #subnet match by zhou, parameters are snlist and es_ip
+        subnet_full=subnet_range.subnet_range(snlist.es_ip)
 
-    return fullmatchlist,segmentlist,subnetlist,msg
+    return fullmatchlist,segmentlist,subnet_lpm,subnet_full
 
-def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetmatch,dataset,msg):
+
+#get four dateset from four match methods , insert separately
+# msg is the info of file
+def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetlpm,subnetfull,msg):
     es_insert = ESclient(server=serverNum, port=dport)
     if len(fullmatch) > 0:
         for i in range(len(fullmatch)):
             doc = {}
-            doc['level'] = dataset[fullmatch[i]]['level']
-            doc['source'] = dataset[fullmatch[i]]['source']
+            doc['level'] = msg['level']
+            doc['source'] = msg['source']
             doc['type'] = "full_match"
             doc[aggs_name] = fullmatch[i]
             doc['@timestamp'] = timestamp
@@ -113,8 +135,8 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             ip_es=segmentmatch[i].keys()[0]
             ipseg=segmentmatch[i][ip_es]
             doc = {}
-            doc['level'] = dataset[ipseg]['level']
-            doc['source'] = dataset[ipseg]['source']
+            doc['level'] = msg['level']
+            doc['source'] = msg['source']
             doc['type'] = ipseg
             doc[aggs_name] = ip_es
             doc['@timestamp'] = timestamp
@@ -122,11 +144,11 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             es_insert.es_index(doc)
         print 'segment_insert'
 
-    if len(subnetmatch) > 0:
-        for i in range(len(subnetmatch)):
+    if len(subnetlpm) > 0:
+        for i in range(len(subnetlpm)):
             # segment insert
-            ip_es=subnetmatch[i].keys()[0]
-            ipseg=subnetmatch[i][ip_es]
+            ip_es=subnetlpm[i].keys()[0]
+            ipseg=subnetlpm[i][ip_es]
             doc = {}
             doc['level'] = msg['level']
             doc['source'] = msg['source']
@@ -135,14 +157,16 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             doc['@timestamp'] = timestamp
             doc['index'] = index
             es_insert.es_index(doc)
-        print 'subnet_insert'
+        print 'subnet_lpm_insert'
+
+    if len(subnetfull) > 0:
+        print 'subnet_full_insert'
 
 
 '''
 step1: get the saved file
-step2: divide the data into 3 parts(ip_32/ip_seg/ip_subnet)
-step3: match each parts
-step4: insert the threat info into es
+step2: divide the data into 3 parts(ip_32/ip_seg/ip_subnet),and match each parts
+step3: insert the threat info into es
 '''
 def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
     path=parser_config.get_store_path()[1]+str(tday)+os.path.sep
@@ -155,9 +179,11 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
     for fname in filelist:
         fpath=path+fname
         dataset=load_dict(fpath)
-        #get match result
-        fullmatch,segmentmatch,subnetmatch,msg=treatip(dataset,ip_es_list)
-        insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetmatch,dataset,msg)
+        if(dataset):
+            msg=dataset[dataset.keys()[0]]
+            #get match result
+            fullmatch,segmentmatch,subnetlpm,subnetfull=treatip(dataset,ip_es_list)
+            insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetlpm,subnetfull,msg)
 
 
 

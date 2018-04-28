@@ -101,7 +101,7 @@ def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
             st=time.clock()
             #update source dataset
             update_blacklist.main(tday,flgnum)
-            # check interval time is 15mins
+            # check interval time is 5mins
             checkES(startTime,indx,aggs_name,serverNum,dport,tday)
             startTime = startTime + delta
             flgnum+=1

@@ -5,7 +5,7 @@ from blacklist_tools import *
 from subnet_range import subnet_range
 import socket,struct
 
-def seperate_ip(ipdict):
+def separate_ip(ipdict):
     regex1 = re.compile('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
     regex2 = re.compile('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\-\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
     regex3 = re.compile('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$')
@@ -37,7 +37,7 @@ def seperate_ip(ipdict):
 #           }
 #   ......
 # }
-def int_ip_range(segment,subnet,es_ip):
+def int_ip_range(segment,es_ip):
     #segment
     ip_segment = segment.keys()
     ip_int = {}
@@ -60,15 +60,7 @@ def int_ip_range(segment,subnet,es_ip):
         flg=ip_segment_match(ip_int, ip_str)
         if(flg):
             segment_match.append(flg)
-
-    # subnet
-    ip_subnet = subnet.keys()
-    if len(ip_subnet)>0:
-        subnet_msg=subnet[ip_subnet[0]]
-    else:
-        subnet_msg={}
-    subnet_match = subnet_range(ip_subnet, es_ip)
-    return segment_match,subnet_match,subnet_msg
+    return segment_match
 
 #only for subnet number range
 # return:  ip_int={
@@ -78,10 +70,18 @@ def int_ip_range(segment,subnet,es_ip):
 #           }
 #   ......
 # }
-def int_ip_subnet(subnet):
+def int_ip_subnet_lpm(subnet,es_ip):
     ip_subnet = subnet.keys()
     #return lpm : lpm=subnet_range()
-    return subnet_range(ip_subnet)
+    # subnet
+    ip_subnet = subnet.keys()
+    if len(ip_subnet)>0:
+        subnet_msg=subnet[ip_subnet[0]]
+    else:
+        subnet_msg={}
+    subnet_match,snlist = subnet_range(ip_subnet, es_ip)
+    return subnet_match,subnet_msg,snlist
+
 
 
 	
@@ -101,7 +101,7 @@ def ip_subnet_match(sublpm,es_ip):
 
 def ip_full_match(full_list,ip_es_list):
     match_result = set(full_list) & set(ip_es_list)
-    return match_result
+    return list(match_result)
 
 # if __name__=="__main__":
 #     subnet = load_dict('.\data\\subnet-2018-03-23.json')

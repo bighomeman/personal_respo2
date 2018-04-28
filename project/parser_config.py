@@ -55,6 +55,14 @@ def get_module_path():
     for temp in module_path_key:
         module_path.append(cp.get('blacklist_moudle_path', temp))
     return module_path
+
+def get_method():
+    # get subnet method
+    source_store_path_key = cp.options("subnet_methods")
+    # value=cp.get(sectionName,keyword)
+    flg_lpm = cp.getint('ES_info', source_store_path_key[0])
+    flg_full = cp.getint('ES_info', source_store_path_key[1])
+    return flg_lpm,flg_full
 # print cp.sections
 #cun period
 #############################################################################################################################
