@@ -122,7 +122,8 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             doc = {}
             doc['level'] = msg['level']
             doc['source'] = msg['source']
-            doc['type'] = "full_match"
+            doc['type']=msg['type']
+            doc['match_type'] = "full_match"
             doc[aggs_name] = fullmatch[i]
             doc['@timestamp'] = timestamp
             doc['index'] = index
@@ -137,7 +138,8 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             doc = {}
             doc['level'] = msg['level']
             doc['source'] = msg['source']
-            doc['type'] = ipseg
+            doc['type'] = msg['type']
+            doc['match_type'] = ipseg
             doc[aggs_name] = ip_es
             doc['@timestamp'] = timestamp
             doc['index'] = index
@@ -152,7 +154,8 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             doc = {}
             doc['level'] = msg['level']
             doc['source'] = msg['source']
-            doc['type'] = ipseg
+            doc['type'] = msg['type']
+            doc['match_type'] = ipseg
             doc[aggs_name] = ip_es
             doc['@timestamp'] = timestamp
             doc['index'] = index
