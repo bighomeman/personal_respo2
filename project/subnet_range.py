@@ -100,7 +100,78 @@ def subnet_lpm(subnet,es_ip):
         ip_es_num = socket.ntohl(struct.unpack("I", socket.inet_aton(str(ips)))[0])
         if(lpm.search_ip(ip_es_num)):
             subnet_result.append({ips:'subnet_lpm'})
-    return subnet_result,sndict
+    return subnet_result, sndict, sn_lte16
 
-def subnet_range(subnet,es_ip):
-    pass
+def subnet_range_match(sndict,sn_lte16,es_ip):
+    sndict_list = []
+    for ips in es_ip:
+        ip_es_num = socket.ntohl(struct.unpack("I",socket.inet_aton(str(ips)))[0])
+        for key in sndict:
+            subnet_num = subnet_range(key)
+            # print subnet_num[0],subnet_num[1]
+            subnet_num_min = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[0])))[0])
+            subnet_num_max = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[1])))[0])
+            if subnet_num_min <= ip_es_num <= subnet_num_max:
+                sndict_list.append({ips:'subnet_full'})
+        for key in sn_lte16:
+            subnet_num = subnet_range(key)
+            # print subnet_num[0],subnet_num[1]
+            subnet_num_min = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[0])))[0])
+            subnet_num_max = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[1])))[0])
+            if subnet_num_min <= ip_es_num <= subnet_num_max:
+                sndict_list.append({ips:'subnet_full'})
+    return sndict_list
+
+def subnet_range(subnet):
+    subnet_split = subnet.split('/')
+    ip_num = ip_split_num(subnet_split[0])
+    netMask = int(subnet_split[1])
+    nm_num = subnet_to_binary(netMask)
+    firstadr = []
+    lastadr = []
+    ip_range = []
+    if netMask == 31:
+        firstadr.append(str(ip_num[0] & nm_num[0]))
+        firstadr.append(str(ip_num[1] & nm_num[1]))
+        firstadr.append(str(ip_num[2] & nm_num[2]))
+        firstadr.append(str(ip_num[3] & nm_num[3]))
+
+        lastadr.append(str(ip_num[0] | (~ nm_num[0] & 0xff)))
+        lastadr.append(str(ip_num[1] | (~ nm_num[1] & 0xff)))
+        lastadr.append(str(ip_num[2] | (~ nm_num[2] & 0xff)))
+        lastadr.append(str(ip_num[3] | (~ nm_num[3] & 0xff)))
+        begin_addr = '.'.join(firstadr)
+        end_addr = '.'.join(lastadr)
+        ip_range.append(begin_addr)
+        ip_range.append(end_addr)
+
+    elif netMask == 32:
+        firstadr.append(str(ip_num[0]))
+        firstadr.append(str(ip_num[1]))
+        firstadr.append(str(ip_num[2]))
+        firstadr.append(str(ip_num[3]))
+
+        lastadr.append(str(ip_num[0]))
+        lastadr.append(str(ip_num[1]))
+        lastadr.append(str(ip_num[2]))
+        lastadr.append(str(ip_num[3]))
+        begin_addr = '.'.join(firstadr)
+        end_addr = '.'.join(lastadr)
+        ip_range.append(begin_addr)
+        ip_range.append(end_addr)
+    else:
+        lastadr.append(str(ip_num[0] | (~ nm_num[0] & 0xff)))
+        lastadr.append(str(ip_num[1] | (~ nm_num[1] & 0xff)))
+        lastadr.append(str(ip_num[2] | (~ nm_num[2] & 0xff)))
+        lastadr.append(str((ip_num[3] | (~ nm_num[3] & 0xff))-1))
+
+        firstadr.append(str(ip_num[0] & nm_num[0]    ))
+        firstadr.append(str(ip_num[1] & nm_num[1]    ))
+        firstadr.append(str(ip_num[2] & nm_num[2]    ))
+        firstadr.append(str((ip_num[3] & nm_num[3])+1))
+        begin_addr = '.'.join(firstadr)
+        end_addr = '.'.join(lastadr)
+        ip_range.append(begin_addr)
+        ip_range.append(end_addr)
+
+    return ip_range
