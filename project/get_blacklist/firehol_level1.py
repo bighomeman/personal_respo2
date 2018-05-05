@@ -15,7 +15,7 @@ def firehol_level1():
         ip_dict[line] = {
             'type':'fire',
             'source':'iplists.firehol.org/files/firehol_level1.netset',
-            'level':'CRITICAL',
+            'level':'INFO',
             'fp':'unknown',
             'status':'unknown',
             'date' : time.strftime('%Y-%m-%d',time.localtime(time.time()))

@@ -116,7 +116,7 @@ def ip_segment_match(num_iprange, ip_es):
     for ip_range in num_iprange.keys():
         # print ip_range[0], ip_range[1]
         if(long(num_iprange[ip_range]["start"])<=ip_es_num<=long(num_iprange[ip_range]["end"])):
-            return {ip_es:ip_range}
+            return {ip_es:"rangematch"}
         # if ip_range[0] <= ip_es_num <=ip_range[1]:
         #     return ip_es
     return False

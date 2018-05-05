@@ -89,7 +89,7 @@ def subnet_lpm(subnet,es_ip):
             ipstr1 = '.'.join(newip1)
             lpm.insert_rule(ipstr1)
         else:
-            #netMask>16 and not in [16,3,24,25],save them
+            #netMask>16 and not in [16,23,24,25],save them
             sndict[sn]=subnet[sn]
 
     saveToJSON(sndict, fpath,"remain_subnet")
@@ -99,7 +99,7 @@ def subnet_lpm(subnet,es_ip):
     for ips in es_ip:
         ip_es_num = socket.ntohl(struct.unpack("I", socket.inet_aton(str(ips)))[0])
         if(lpm.search_ip(ip_es_num)):
-            subnet_result.append({ips:'subnet_lpm'})
+            subnet_result.append({ips:'subnet_lpm_match'})
     return subnet_result, sndict, sn_lte16
 
 def subnet_range_match(sndict,sn_lte16,es_ip):
@@ -112,14 +112,14 @@ def subnet_range_match(sndict,sn_lte16,es_ip):
             subnet_num_min = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[0])))[0])
             subnet_num_max = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[1])))[0])
             if subnet_num_min <= ip_es_num <= subnet_num_max:
-                sndict_list.append({ips:'subnet_full'})
+                sndict_list.append({ips:'subnet_fullmatch'})
         for key in sn_lte16:
             subnet_num = subnet_range(key)
             # print subnet_num[0],subnet_num[1]
             subnet_num_min = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[0])))[0])
             subnet_num_max = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[1])))[0])
             if subnet_num_min <= ip_es_num <= subnet_num_max:
-                sndict_list.append({ips:'subnet_full'})
+                sndict_list.append({ips:'subnet_fullmatch'})
     return sndict_list
 
 def subnet_range(subnet):

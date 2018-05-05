@@ -15,9 +15,9 @@ def bitnodes():
     for ip_port in result:
         ip = ip_port.split(':')[0]
         ip_dict[ip] ={
-            'type':'mining pool',
+            'type':'mining_pool',
             'source':'bitnodes.earn.com/api/v1/snapshots/latest/',
-            'level':'CRITICAL',
+            'level':'INFO',
             'fp':'unknown',
             'status':'unknown',
             'date': timestamp_datetime(neir_json['nodes'][ip_port][2])

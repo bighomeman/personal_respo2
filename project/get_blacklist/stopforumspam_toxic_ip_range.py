@@ -17,7 +17,7 @@ def stopforumspam_toxic_ip_range():
         ip_dict[line] = {
             'type':'spam',
             'source':'http://www.stopforumspam.com/downloads/toxic_ip_range.txt',
-            'level':'WARNING',
+            'level':'INFO',
             'fp':'unknown',
             'status':'unknown',
             'date' : time.strftime('%Y-%m-%d',time.localtime(time.time()))
