@@ -72,7 +72,7 @@ class ESclient(object):
 		数据回插es的alert-*索引
 		'''
 		ret = self.__es_client.index(
-			index = 'alert-{}'.format(datetime.datetime.now().strftime('%Y-%m-%d')),
+			index = 'blacklist_ip-{}'.format(datetime.datetime.now().strftime('%Y-%m-%d')),
 			doc_type = 'netflow_v9',
 			body = doc
 			)
@@ -99,16 +99,18 @@ def treatip(dataset,es_ip):
     fullmatchlist=treat_ip.ip_full_match(full_list, es_ip)
     # segment match, segmentlist:[{},{},...]
     segmentlist=treat_ip.int_ip_range(segment,es_ip)
-    subnet_lpm={}
-    subnet_full={}
+    subnet_lpm = {}
+    subnet_full = {}
+    sndict = {}
+    sn_lte16 = {}
     # read conf file to choose the methods
     flg_lpm,flg_full=parser_config.get_method()
     if(1==flg_lpm):
         # subnet match by lpm
-        subnet_lpm,sndict=subnet_range.subnet_lpm(subnet,es_ip)
+        subnet_lpm,sndict,sn_lte16=subnet_range.subnet_lpm(subnet,es_ip)
     if(1==flg_full):
         #subnet match by zhou, parameters are snlist and es_ip
-        subnet_full=subnet_range.subnet_range(sndict.es_ip)
+        subnet_full=subnet_range.subnet_range_match(sndict,sn_lte16,es_ip)
 
     return fullmatchlist,segmentlist,subnet_lpm,subnet_full
 
@@ -134,7 +136,9 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
         for i in range(len(segmentmatch)):
             # segment insert
             ip_es=segmentmatch[i].keys()[0]
+            print ip_es
             ipseg=segmentmatch[i][ip_es]
+            print ipseg
             doc = {}
             doc['level'] = msg['level']
             doc['source'] = msg['source']
@@ -150,7 +154,9 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
         for i in range(len(subnetlpm)):
             # segment insert
             ip_es=subnetlpm[i].keys()[0]
+            print ip_es
             ipseg=subnetlpm[i][ip_es]
+            print ipseg
             doc = {}
             doc['level'] = msg['level']
             doc['source'] = msg['source']
@@ -163,6 +169,21 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
         print 'subnet_lpm_insert'
 
     if len(subnetfull) > 0:
+        for i in range(len(subnetfull)):
+            # segment insert
+            ip_es=subnetfull[i].keys()[0]
+            print ip_es
+            ipseg=subnetfull[i][ip_es]
+            print ipseg
+            doc = {}
+            doc['level'] = msg['level']
+            doc['source'] = msg['source']
+            doc['type'] = msg['type']
+            doc['match_type'] = ipseg
+            doc[aggs_name] = ip_es
+            doc['@timestamp'] = timestamp
+            doc['index'] = index
+            es_insert.es_index(doc)
         print 'subnet_full_insert'
 
 

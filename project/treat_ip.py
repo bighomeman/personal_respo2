@@ -28,6 +28,33 @@ def separate_ip(ipdict):
     # saveAsJSON(date, subnet, path, 'subnet')
     return full_match,segment,subnet
 
+def separate_ip_lpm(ipdict):
+    regex_exactly = re.compile('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
+    regex_segment_8 = re.compile('^\d{1,3}\.0\.0\.0\-\d{1,3}\.255\.255\.255$')
+    regex_segment_16 = re.compile('^\d{1,3}\.\d{1,3}\.0\.0\-\d{1,3}\.\d{1,3}\.255\.255$')
+    regex_segment_24 = re.compile('^\d{1,3}\.\d{1,3}\.\d{1,3}\.0\-\d{1,3}\.\d{1,3}\.\d{1,3}\.255$')
+    regex_subnet_8 = re.compile('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/8$')
+    regex_subnet_16 = re.compile('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/16$')
+    regex_subnet_24 = re.compile('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/24$')
+    iplist = ipdict.keys()
+    full_match = {}
+    ip_8 = {}
+    ip_16 = {}
+    ip_24 = {}
+    for ip_element in iplist:
+        if regex_exactly.match(ip_element):
+            full_match[ip_element] = ipdict[ip_element]
+        elif regex_segment_8.match(ip_element) or regex_subnet_8.match(ip_element):
+            ip_rule_8 = ip_element.split('.')[0]+'.*.*.*'
+            ip_8[ip_rule_8] = ipdict[ip_element]
+        elif regex_segment_16.match(ip_element) or regex_subnet_16.match(ip_element):
+            ip_rule_16 = ip_element.split('.')[0]+'.'+ip_element.split('.')[1]+'.*.*'
+            ip_16[ip_rule_16] = ipdict[ip_element]
+        elif  regex_segment_24.match(ip_element) or regex_subnet_24.match(ip_element):
+            ip_rule_24 = ip_element.split('.')[0]+'.'+ip_element.split('.')[1]+'.'+ip_element.split('.')[2]+'.*'
+            ip_24[ip_rule_24] = ipdict[ip_element]
+    return full_match,ip_8,ip_16,ip_24
+
 
 #only fit in XXX.XXX.XXX.XXX-XXX.XXX.XXX.XXX
 # return:  ip_int={
@@ -71,7 +98,6 @@ def int_ip_range(segment,es_ip):
 #   ......
 # }
 def int_ip_subnet_lpm(subnet,es_ip):
-    ip_subnet = subnet.keys()
     #return lpm : lpm=subnet_range()
     # subnet
     ip_subnet = subnet.keys()
