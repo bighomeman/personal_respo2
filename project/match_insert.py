@@ -136,9 +136,9 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
         for i in range(len(segmentmatch)):
             # segment insert
             ip_es=segmentmatch[i].keys()[0]
-            print ip_es
+            # print ip_es
             ipseg=segmentmatch[i][ip_es]
-            print ipseg
+            # print ipseg
             doc = {}
             doc['level'] = msg['level']
             doc['source'] = msg['source']
@@ -154,9 +154,9 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
         for i in range(len(subnetlpm)):
             # segment insert
             ip_es=subnetlpm[i].keys()[0]
-            print ip_es
+            # print ip_es
             ipseg=subnetlpm[i][ip_es]
-            print ipseg
+            # print ipseg
             doc = {}
             doc['level'] = msg['level']
             doc['source'] = msg['source']
@@ -172,9 +172,9 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
         for i in range(len(subnetfull)):
             # segment insert
             ip_es=subnetfull[i].keys()[0]
-            print ip_es
+            # print ip_es
             ipseg=subnetfull[i][ip_es]
-            print ipseg
+            # print ipseg
             doc = {}
             doc['level'] = msg['level']
             doc['source'] = msg['source']

@@ -115,7 +115,7 @@ if __name__=="__main__":
     delta,discard=parser_config.getCheckDeltatime()
     # entertime =
     entertime = time.strftime("%Y-%m-%d %H:%M:%S")
-    startTime = datetime.datetime.strptime(entertime, '%Y-%m-%d %H:%M:%S')
+    startTime = datetime.datetime.strptime(discard, '%Y-%m-%d %H:%M:%S')
     serverNum,dport,indx,aggs_name=parser_config.get_ES_info()
     #serverNum='172.23.2.96',dport = "9200";indx=tcp-*; aggs_name=dip
     new_run(startTime,delta,serverNum,dport,indx,aggs_name)
