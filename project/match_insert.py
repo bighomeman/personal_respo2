@@ -4,7 +4,8 @@
 from elasticsearch import Elasticsearch
 import json
 import datetime,sys
-from blacklist_tools import load_dict,getlog
+from blacklist_tools import load_dict
+import blacklist_tools
 import treat_ip
 import parser_config
 import os
@@ -119,7 +120,7 @@ def treatip(dataset,es_ip):
 # msg is the info of file
 def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetlpm,subnetfull,msg):
     es_insert = ESclient(server=serverNum, port=dport)
-    mylog=getlog()
+    mylog=blacklist_tools.getlog()
     if len(fullmatch) > 0:
         for i in range(len(fullmatch)):
             doc = {}
