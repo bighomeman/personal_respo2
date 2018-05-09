@@ -3,6 +3,8 @@
 
 import datetime
 import json
+import os
+import logging
 
 def judge_level(fp,status):
 	'''
@@ -130,3 +132,8 @@ def create_Trie(blacklist):
 		domainTrie=insert(domainTrie,domain)
 	return domainTrie
 
+def getlog():
+	logfile = os.getcwd() + os.path.sep + 'data' + os.path.sep + 'testlog.log'
+	formatter1 = '%(asctime)s %(levelname)-8s: %(message)s'
+	logging.basicConfig(filename=logfile,level=logging.INFO,format=formatter1)
+	return logging
