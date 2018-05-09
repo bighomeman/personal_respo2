@@ -150,7 +150,7 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             doc['desc_type'] = '[MAL_IP] Request of suspect IP detection.'
             doc['desc_subtype'] = msg[ipseg]['desc_subtype']
             doc['subtype'] = msg[ipseg]['subtype']
-            doc['match_type'] = "rangematch"
+            doc['match_type'] = "segment_match"
             doc[aggs_name] = ip_es
             doc['@timestamp'] = timestamp
             doc['index'] = index
@@ -173,7 +173,7 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             tmptype=msg[key1]['desc_subtype'].split(';')
             doc['desc_subtype'] = tmptype[0].split(':')[0]+':unkown'+';'+tmptype[1]
             doc['subtype'] = msg[key1]['subtype']
-            doc['match_type'] = ipseg
+            doc['match_type'] = 'subnet_lpm_match'
             doc[aggs_name] = ip_es
             doc['@timestamp'] = timestamp
             doc['index'] = index
