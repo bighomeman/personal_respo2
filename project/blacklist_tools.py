@@ -134,7 +134,7 @@ def create_Trie(blacklist):
 
 def getlog():
 	tday = datetime.datetime.now().date()
-	logfile = os.getcwd() + os.path.sep + 'data' + os.path.sep +str(tday)+ os.path.sep+ 'testlog.log'
+	logfile = os.getcwd() + os.path.sep + 'data' + os.path.sep +'log'+ os.path.sep+ 'testlog-{}.log'.format(str(tday))
 	formatter1 = '%(asctime)s %(levelname)-8s: %(message)s'
 	logging.basicConfig(filename=logfile,level=logging.INFO,format=formatter1)
 	return logging
