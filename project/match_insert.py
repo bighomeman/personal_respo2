@@ -117,18 +117,18 @@ def treatip(dataset,es_ip):
 
 
 #get four dateset from four match methods , insert separately
-# msg is the info of file
+# msg is original data
 def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetlpm,subnetfull,msg):
     es_insert = ESclient(server=serverNum, port=dport)
     mylog=blacklist_tools.getlog()
     if len(fullmatch) > 0:
         for i in range(len(fullmatch)):
             doc = {}
-            doc['level'] = msg['level']
+            doc['level'] = msg[fullmatch[i]]['level']
             doc['type']='MAL_IP'
             doc['desc_type']='[MAL_IP] Request of suspect IP detection.'
-            doc['desc_subtype'] = msg['desc_subtype']
-            doc['subtype']=msg['subtype']
+            doc['desc_subtype'] = msg[fullmatch[i]]['desc_subtype']
+            doc['subtype']=msg[fullmatch[i]]['subtype']
             doc['match_type'] = "full_match"
             doc[aggs_name] = fullmatch[i]
             doc['@timestamp'] = timestamp
@@ -145,12 +145,12 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             ipseg=segmentmatch[i][ip_es]
             # print ipseg
             doc = {}
-            doc['level'] = msg['level']
+            doc['level'] = msg[ipseg]['level']
             doc['type'] = 'MAL_IP'
             doc['desc_type'] = '[MAL_IP] Request of suspect IP detection.'
-            doc['desc_subtype'] = msg['desc_subtype']
-            doc['subtype'] = msg['subtype']
-            doc['match_type'] = ipseg
+            doc['desc_subtype'] = msg[ipseg]['desc_subtype']
+            doc['subtype'] = msg[ipseg]['subtype']
+            doc['match_type'] = "rangematch"
             doc[aggs_name] = ip_es
             doc['@timestamp'] = timestamp
             doc['index'] = index
@@ -165,12 +165,14 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             # print ip_es
             ipseg=subnetlpm[i][ip_es]
             # print ipseg
+            key1=msg.keys()[0]
             doc = {}
-            doc['level'] = msg['level']
+            doc['level'] = msg[key1]['level']
             doc['type'] = 'MAL_IP'
             doc['desc_type'] = '[MAL_IP] Request of suspect IP detection.'
-            doc['desc_subtype'] = msg['desc_subtype']
-            doc['subtype'] = msg['subtype']
+            tmptype=msg[key1]['desc_subtype'].split(';')
+            doc['desc_subtype'] = tmptype[0].split(':')[0]+':unkown'+';'+tmptype[1]
+            doc['subtype'] = msg[key1]['subtype']
             doc['match_type'] = ipseg
             doc[aggs_name] = ip_es
             doc['@timestamp'] = timestamp
@@ -187,12 +189,12 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             ipseg=subnetfull[i][ip_es]
             # print ipseg
             doc = {}
-            doc['level'] = msg['level']
+            doc['level'] = msg[ipseg]['level']
             doc['type'] = 'MAL_IP'
             doc['desc_type'] = '[MAL_IP] Request of suspect IP detection.'
-            doc['desc_subtype'] = msg['desc_subtype']
-            doc['subtype'] = msg['subtype']
-            doc['match_type'] = ipseg
+            doc['desc_subtype'] = msg[ipseg]['desc_subtype']
+            doc['subtype'] = msg[ipseg]['subtype']
+            doc['match_type'] = 'subnet_fullmatch'
             doc[aggs_name] = ip_es
             doc['@timestamp'] = timestamp
             doc['index'] = index
@@ -221,7 +223,7 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
             msg=dataset[dataset.keys()[0]]
             #get match result
             fullmatch,segmentmatch,subnetlpm,subnetfull=treatip(dataset,ip_es_list)
-            insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetlpm,subnetfull,msg)
+            insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetlpm,subnetfull,dataset)
 
 
 

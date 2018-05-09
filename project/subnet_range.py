@@ -105,6 +105,7 @@ def subnet_lpm(subnet,es_ip):
             subnet_result.append({ips:'subnet_lpm_match'})
     return subnet_result, sndict, sn_lte16
 
+# zhou
 def subnet_range_match(sndict,sn_lte16,es_ip):
     sndict_list = []
     for ips in es_ip:
@@ -115,14 +116,14 @@ def subnet_range_match(sndict,sn_lte16,es_ip):
             subnet_num_min = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[0])))[0])
             subnet_num_max = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[1])))[0])
             if subnet_num_min <= ip_es_num <= subnet_num_max:
-                sndict_list.append({ips:'subnet_fullmatch'})
-        for key in sn_lte16:
+                sndict_list.append({ips:key})
+        for key in sn_lte16:#key is ip
             subnet_num = subnet_range(key)
             # print subnet_num[0],subnet_num[1]
             subnet_num_min = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[0])))[0])
             subnet_num_max = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[1])))[0])
             if subnet_num_min <= ip_es_num <= subnet_num_max:
-                sndict_list.append({ips:'subnet_fullmatch'})
+                sndict_list.append({ips:key})
     return sndict_list
 
 def subnet_range(subnet):
