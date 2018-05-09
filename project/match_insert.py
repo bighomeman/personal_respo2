@@ -125,8 +125,8 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
         for i in range(len(fullmatch)):
             doc = {}
             doc['level'] = msg['level']
-            doc['type']='MAL_TCP'
-            doc['desc_type']='[MAL_TCP] Request of suspect IP detection.'
+            doc['type']='MAL_IP'
+            doc['desc_type']='[MAL_IP] Request of suspect IP detection.'
             doc['desc_subtype'] = msg['desc_subtype']
             doc['subtype']=msg['subtype']
             doc['match_type'] = "full_match"
@@ -146,8 +146,8 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             # print ipseg
             doc = {}
             doc['level'] = msg['level']
-            doc['type'] = 'MAL_TCP'
-            doc['desc_type'] = '[MAL_TCP] Request of suspect IP detection.'
+            doc['type'] = 'MAL_IP'
+            doc['desc_type'] = '[MAL_IP] Request of suspect IP detection.'
             doc['desc_subtype'] = msg['desc_subtype']
             doc['subtype'] = msg['subtype']
             doc['match_type'] = ipseg
@@ -167,8 +167,8 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             # print ipseg
             doc = {}
             doc['level'] = msg['level']
-            doc['type'] = 'MAL_TCP'
-            doc['desc_type'] = '[MAL_TCP] Request of suspect IP detection.'
+            doc['type'] = 'MAL_IP'
+            doc['desc_type'] = '[MAL_IP] Request of suspect IP detection.'
             doc['desc_subtype'] = msg['desc_subtype']
             doc['subtype'] = msg['subtype']
             doc['match_type'] = ipseg
@@ -188,8 +188,8 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             # print ipseg
             doc = {}
             doc['level'] = msg['level']
-            doc['type'] = 'MAL_TCP'
-            doc['desc_type'] = '[MAL_TCP] Request of suspect IP detection.'
+            doc['type'] = 'MAL_IP'
+            doc['desc_type'] = '[MAL_IP] Request of suspect IP detection.'
             doc['desc_subtype'] = msg['desc_subtype']
             doc['subtype'] = msg['subtype']
             doc['match_type'] = ipseg
