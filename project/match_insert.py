@@ -73,7 +73,7 @@ class ESclient(object):
 		数据回插es的alert-*索引
 		'''
 		ret = self.__es_client.index(
-			index = 'blacklist_ip-{}'.format(datetime.datetime.now().strftime('%Y-%m-%d')),
+			index = 'alert-{}'.format(datetime.datetime.now().strftime('%Y-%m-%d')),
 			doc_type = 'netflow_v9',
 			body = doc
 			)
