@@ -28,7 +28,7 @@ def update_blacklist_module(flgnum):
                 # print status
             except Exception,e:
                 # print e
-                mylog.info(e)
+                mylog.error(e)
 
 def main(tday,flgnum):
     mylog=blacklist_tools.getlog()

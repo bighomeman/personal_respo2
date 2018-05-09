@@ -125,8 +125,10 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
         for i in range(len(fullmatch)):
             doc = {}
             doc['level'] = msg['level']
-            doc['source'] = msg['source']
-            doc['type']=msg['type']
+            doc['type']='MAL_TCP'
+            doc['desc_type']='[MAL_TCP] Request of suspect IP detection.'
+            doc['desc_subtype'] = msg['desc_subtype']
+            doc['subtype']=msg['subtype']
             doc['match_type'] = "full_match"
             doc[aggs_name] = fullmatch[i]
             doc['@timestamp'] = timestamp
@@ -144,8 +146,10 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             # print ipseg
             doc = {}
             doc['level'] = msg['level']
-            doc['source'] = msg['source']
-            doc['type'] = msg['type']
+            doc['type'] = 'MAL_TCP'
+            doc['desc_type'] = '[MAL_TCP] Request of suspect IP detection.'
+            doc['desc_subtype'] = msg['desc_subtype']
+            doc['subtype'] = msg['subtype']
             doc['match_type'] = ipseg
             doc[aggs_name] = ip_es
             doc['@timestamp'] = timestamp
@@ -163,8 +167,10 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             # print ipseg
             doc = {}
             doc['level'] = msg['level']
-            doc['source'] = msg['source']
-            doc['type'] = msg['type']
+            doc['type'] = 'MAL_TCP'
+            doc['desc_type'] = '[MAL_TCP] Request of suspect IP detection.'
+            doc['desc_subtype'] = msg['desc_subtype']
+            doc['subtype'] = msg['subtype']
             doc['match_type'] = ipseg
             doc[aggs_name] = ip_es
             doc['@timestamp'] = timestamp
@@ -182,8 +188,10 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             # print ipseg
             doc = {}
             doc['level'] = msg['level']
-            doc['source'] = msg['source']
-            doc['type'] = msg['type']
+            doc['type'] = 'MAL_TCP'
+            doc['desc_type'] = '[MAL_TCP] Request of suspect IP detection.'
+            doc['desc_subtype'] = msg['desc_subtype']
+            doc['subtype'] = msg['subtype']
             doc['match_type'] = ipseg
             doc[aggs_name] = ip_es
             doc['@timestamp'] = timestamp

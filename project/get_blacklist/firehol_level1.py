@@ -14,8 +14,8 @@ def firehol_level1():
     for line in lines:
         # print line
         ip_dict[line] = {
-            'type':'fire',
-            'source':'iplists.firehol.org/files/firehol_level1.netset',
+            'subtype':'suspect',
+            'desc_subtype':'suspect ip:{};source:iplists.firehol.org/files/firehol_level1.netset'.format(line),
             'level':'INFO',
             'fp':'unknown',
             'status':'unknown',

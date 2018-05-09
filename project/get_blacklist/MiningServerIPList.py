@@ -19,8 +19,8 @@ def MiningServerIPList():
     ip_dict = {}
     for ip in result:
         ip_dict[ip] ={
-            'type':'mining_pool',
-            'source':'github.com/ZeroDot1/CoinBlockerLists/blob/master/MiningServerIPList',
+            'subtype':'mining_pool',
+            'desc_subtype':'mining pool ip:{};source:github.com/ZeroDot1/CoinBlockerLists/blob/master/MiningServerIPList'.format(ip),
             'level':'INFO',
             'fp':'unknown',
             'status':'unknown',

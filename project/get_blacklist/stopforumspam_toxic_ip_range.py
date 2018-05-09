@@ -16,8 +16,8 @@ def stopforumspam_toxic_ip_range():
     for line in lines:
         # print line
         ip_dict[line] = {
-            'type':'spam',
-            'source':'http://www.stopforumspam.com/downloads/toxic_ip_range.txt',
+            'subtype':'spam',
+            'desc_subtype':'spam ip:{};source:http://www.stopforumspam.com/downloads/toxic_ip_range.txt'.format(line),
             'level':'INFO',
             'fp':'unknown',
             'status':'unknown',
