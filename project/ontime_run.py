@@ -7,6 +7,7 @@ import datetime
 import match_insert
 import parser_config
 import update_blacklist
+import blacklist_tools
 
 second = datetime.timedelta(seconds=1)
 day = datetime.timedelta(days=1)
@@ -66,18 +67,22 @@ day = datetime.timedelta(days=1)
 
 def checkES(startTime,indx,aggs_name,serverNum,dport,tday):
     # new check function
+    mylog=blacklist_tools.getlog()
     try:
-        print("Starting check command."), time.ctime()
+        # print("Starting check command."), time.ctime()
+        mylog.info("Starting check command.")
         # execute the command
         gte = (startTime - delta).strftime('%Y-%m-%d %H:%M:%S')
         lte = (startTime).strftime('%Y-%m-%d %H:%M:%S')
         timestamp = (startTime).strftime('%Y-%m-%dT%H:%M:%S') + ".000+08:00"
         match_insert.main(tday,indx,gte,lte,aggs_name,timestamp,serverNum,dport)
-        print("check finish."), time.ctime()
+        # print("check finish."), time.ctime()
+        mylog.info("check finish.")
         print"="*40
 
     except Exception, e:
-        print e
+        # print e
+        mylog.error(e)
 
 
 
@@ -90,12 +95,14 @@ def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
     # get format: "yy-mm-dd"
     tday=datetime.datetime.now().date()
     runtime=0 # elapsed time of whole process,included check and merge
+    mylog=blacklist_tools.getlog()
     while True:
         if(tday!=datetime.datetime.now().date()):
             flgnum=0 # reset flgnum per day
             tday=datetime.datetime.now().date()
         while datetime.datetime.now() < startTime:
-            print('time sleep...')
+            #print('time sleep...')
+            mylog.info("time sleep...")
             time.sleep(delta.seconds-runtime)
         try:
             st=time.clock()
@@ -107,7 +114,8 @@ def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
             flgnum+=1
             runtime=time.clock()-st# get the time of whole process
         except Exception, e:
-            print e
+            # print e
+            mylog.error(e)
 
 
 if __name__=="__main__":

@@ -4,7 +4,7 @@
 from elasticsearch import Elasticsearch
 import json
 import datetime,sys
-from blacklist_tools import load_dict
+from blacklist_tools import load_dict,getlog
 import treat_ip
 import parser_config
 import os
@@ -119,6 +119,7 @@ def treatip(dataset,es_ip):
 # msg is the info of file
 def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetlpm,subnetfull,msg):
     es_insert = ESclient(server=serverNum, port=dport)
+    mylog=getlog()
     if len(fullmatch) > 0:
         for i in range(len(fullmatch)):
             doc = {}
@@ -131,6 +132,7 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             doc['index'] = index
             es_insert.es_index(doc)
         print 'full_match_insert'
+        mylog.info('full_match_insert')
 
     if len(segmentmatch) > 0:
         for i in range(len(segmentmatch)):
@@ -149,6 +151,7 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             doc['index'] = index
             es_insert.es_index(doc)
         print 'segment_insert'
+        mylog.info('segment_insert')
 
     if len(subnetlpm) > 0:
         for i in range(len(subnetlpm)):
@@ -167,6 +170,7 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             doc['index'] = index
             es_insert.es_index(doc)
         print 'subnet_lpm_insert'
+        mylog.info('subnet_lpm_insert')
 
     if len(subnetfull) > 0:
         for i in range(len(subnetfull)):
@@ -185,6 +189,7 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             doc['index'] = index
             es_insert.es_index(doc)
         print 'subnet_full_insert'
+        mylog.info('subnet_full_insert')
 
 
 '''

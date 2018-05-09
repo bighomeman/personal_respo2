@@ -6,9 +6,11 @@ import parser_config
 import datetime
 import lpm
 import socket,struct
+import blacklist_tools
 
 def saveToJSON(dict1,path,name):
     "add the subnet to file"
+    mylog=blacklist_tools.getlog()
     tday = datetime.datetime.now().date()
     file_name = path + name + '-' + str(tday) + '.json'
     try:
@@ -16,6 +18,7 @@ def saveToJSON(dict1,path,name):
             f.write(json.dumps(dict1))
     except IOError:
         print 'save Error'
+        mylog.error('saveToJSON Error!')
 
 
 def ip_split_num(ip):
