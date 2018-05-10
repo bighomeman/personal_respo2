@@ -110,20 +110,20 @@ def subnet_lpm(subnet,es_ip):
     lpmpath=getsavepath(fpath,'lpm_subnet_data')
     if(os.path.exists(snpath)):
         newsndict=blacklist_tools.load_dict(snpath)
-        newsndict.update(sndict)#merge
-        saveToJSON(newsndict, fpath, "remain_subnet")
+        newsndict1=dict(newsndict,**sndict)#merge
+        saveToJSON(newsndict1, fpath, "remain_subnet")
     else:
         saveToJSON(sndict, fpath,"remain_subnet")
     if(os.path.exists(ltepath)):
-        newlte16=blacklist_tools.load_dict(ltepath)
-        newlte16.update(sn_lte16)
+        newlte=blacklist_tools.load_dict(ltepath)
+        newlte16=dict(newlte,**sn_lte16)#merge
         saveToJSON(newlte16, fpath, 'lte16_subnet')
     else:
         saveToJSON(sn_lte16,fpath,'lte16_subnet')
     if(os.path.exists(lpmpath)):
         newlpmdict=blacklist_tools.load_dict(lpmpath)
-        newlpmdict.update(lpmdict)
-        saveToJSON(newlpmdict, fpath, 'lpm_subnet_data')
+        newlpmdict1=dict(newlpmdict,**lpmdict)#merge
+        saveToJSON(newlpmdict1, fpath, 'lpm_subnet_data')
     else:
         saveToJSON(lpmdict,fpath,'lpm_subnet_data')
     #match
