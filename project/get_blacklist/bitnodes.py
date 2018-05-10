@@ -3,6 +3,7 @@
 
 import requests , re, json,time
 from store_json import store_json
+import blacklist_tools
 
 
 def bitnodes():
@@ -15,9 +16,9 @@ def bitnodes():
     for ip_port in result:
         ip = ip_port.split(':')[0]
         ip_dict[ip] ={
-            'type':'mining pool',
-            'source':'bitnodes.earn.com/api/v1/snapshots/latest/',
-            'level':'CRITICAL',
+            'subtype':'mining_pool',
+            'desc_subtype':'mining pool ip:{};source:bitnodes.earn.com/api/v1/snapshots/latest/'.format(ip),
+            'level':'INFO',
             'fp':'unknown',
             'status':'unknown',
             'date': timestamp_datetime(neir_json['nodes'][ip_port][2])
@@ -36,8 +37,10 @@ def timestamp_datetime(value):
 
 def main():
     dict = bitnodes()
+    mylog=blacklist_tools.getlog()
     print len(dict.keys())
     store_json(dict, 'bitnodes')
+    mylog.info("update bitnodes!")
 
 if __name__=="__main__":
     main()

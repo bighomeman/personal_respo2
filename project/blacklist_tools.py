@@ -3,6 +3,8 @@
 
 import datetime
 import json
+import os
+import logging
 
 def judge_level(fp,status):
 	'''
@@ -103,6 +105,7 @@ def load_dict(filedir):
 	'''
 	加载本地的json文件
 	'''
+	dict1={}
 	try:
 		with open(filedir,'r') as f:
 			dict1=json.loads(f.read())
@@ -130,3 +133,9 @@ def create_Trie(blacklist):
 		domainTrie=insert(domainTrie,domain)
 	return domainTrie
 
+def getlog():
+	tday = datetime.datetime.now().date()
+	logfile = os.getcwd() + os.path.sep + 'data' + os.path.sep +'log'+ os.path.sep+ 'testlog-{}.log'.format(str(tday))
+	formatter1 = '%(asctime)s %(levelname)-8s: %(message)s'
+	logging.basicConfig(filename=logfile,level=logging.INFO,format=formatter1)
+	return logging

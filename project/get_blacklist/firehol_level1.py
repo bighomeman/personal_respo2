@@ -3,6 +3,7 @@
 
 import requests,time
 from store_json import store_json
+import blacklist_tools
 
 def firehol_level1():
     http = requests.get('http://iplists.firehol.org/files/firehol_level1.netset')
@@ -13,9 +14,9 @@ def firehol_level1():
     for line in lines:
         # print line
         ip_dict[line] = {
-            'type':'fire',
-            'source':'iplists.firehol.org/files/firehol_level1.netset',
-            'level':'CRITICAL',
+            'subtype':'suspect',
+            'desc_subtype':'suspect ip:{};source:iplists.firehol.org/files/firehol_level1.netset'.format(line),
+            'level':'INFO',
             'fp':'unknown',
             'status':'unknown',
             'date' : time.strftime('%Y-%m-%d',time.localtime(time.time()))
@@ -24,8 +25,10 @@ def firehol_level1():
 
 def main():
     dict = firehol_level1()
+    mylog=blacklist_tools.getlog()
     print len(dict.keys())
     store_json(dict, 'firehol_level1')
+    mylog.info("update firehol!")
 
 if __name__=="__main__":
     main()
