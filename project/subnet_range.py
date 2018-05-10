@@ -7,12 +7,17 @@ import datetime
 import lpm
 import socket,struct
 import blacklist_tools
+import os
+
+def getsavepath(fpath,name):
+    tday = datetime.datetime.now().date()
+    file_name = fpath + name + '_' + str(tday) + '.json'
+    return file_name
 
 def saveToJSON(dict1,path,name):
     "add the subnet to file"
     mylog=blacklist_tools.getlog()
-    tday = datetime.datetime.now().date()
-    file_name = path + name + '-' + str(tday) + '.json'
+    file_name = getsavepath(path,name)
     try:
         with open(file_name,'a') as f:
             f.write(json.dumps(dict1))
@@ -99,9 +104,28 @@ def subnet_lpm(subnet,es_ip):
             #netMask>16 and not in [16,23,24,25],save them
             sndict[sn]=subnet[sn]
 
-    saveToJSON(sndict, fpath,"remain_subnet")
-    saveToJSON(sn_lte16,fpath,'lte16_subnet')
-    saveToJSON(lpmdict,fpath,'lpm_subnet_data')
+    #save
+    snpath=getsavepath(fpath,'remain_subnet')
+    ltepath=getsavepath(fpath,'lte16_subnet')
+    lpmpath=getsavepath(fpath,'lpm_subnet_data')
+    if(os.path.exists(snpath)):
+        newsndict=blacklist_tools.load_dict(snpath)
+        newsndict.update(sndict)#merge
+        saveToJSON(newsndict, fpath, "remain_subnet")
+    else:
+        saveToJSON(sndict, fpath,"remain_subnet")
+    if(os.path.exists(ltepath)):
+        newlte16=blacklist_tools.load_dict(ltepath)
+        newlte16.update(sn_lte16)
+        saveToJSON(newlte16, fpath, 'lte16_subnet')
+    else:
+        saveToJSON(sn_lte16,fpath,'lte16_subnet')
+    if(os.path.exists(lpmpath)):
+        newlpmdict=blacklist_tools.load_dict(lpmpath)
+        newlpmdict.update(lpmdict)
+        saveToJSON(newlpmdict, fpath, 'lpm_subnet_data')
+    else:
+        saveToJSON(lpmdict,fpath,'lpm_subnet_data')
     #match
     subnet_result=[]
     for ips in es_ip:
