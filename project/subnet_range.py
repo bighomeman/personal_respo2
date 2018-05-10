@@ -45,6 +45,7 @@ def subnet_lpm(subnet,es_ip):
     sndict = {}
     fpath = parser_config.get_store_path()[1]
     sn_lte16 = {}
+    lpmdict={}
     ip_subnet=subnet.keys()
     for sn in ip_subnet:
         subnet_split = sn.split('/')
@@ -57,6 +58,7 @@ def subnet_lpm(subnet,es_ip):
             sn_lte16[sn]=subnet[sn]
             # return 'False'
         elif(netMask==16):
+            lpmdict[sn]=subnet[sn]
             newip1 = []
             ip_num[2] = ip_num[2] | 1
             newip1.append(str(ip_num[0]))
@@ -66,6 +68,7 @@ def subnet_lpm(subnet,es_ip):
             ipstr1 = '.'.join(newip1)
             lpm.insert_rule(ipstr1)
         elif(netMask==23):
+            lpmdict[sn] = subnet[sn]
             newip1=[]
             ip_num[2]=ip_num[2]|1
             newip1.append(str(ip_num[0]))
@@ -84,6 +87,7 @@ def subnet_lpm(subnet,es_ip):
             lpm.insert_rule(ipstr2)
         elif(netMask==25 or netMask==24):
             #/25当/24处理
+            lpmdict[sn] = subnet[sn]
             newip1 = []
             newip1.append(str(ip_num[0]))
             newip1.append(str(ip_num[1]))
@@ -97,6 +101,7 @@ def subnet_lpm(subnet,es_ip):
 
     saveToJSON(sndict, fpath,"remain_subnet")
     saveToJSON(sn_lte16,fpath,'lte16_subnet')
+    saveToJSON(lpmdict,fpath,'lpm_subnet_data')
     #match
     subnet_result=[]
     for ips in es_ip:
