@@ -209,24 +209,30 @@ step2: divide the data into 3 parts(ip_32/ip_seg/ip_subnet),and match each parts
 step3: insert the threat info into es
 '''
 def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
-    path=parser_config.get_store_path()[1]+str(tday)+os.path.sep
-    filelist=get_all_file(path)
     mylog = blacklist_tools.getlog()
+    path=parser_config.get_store_path()[1]+str(tday)+os.path.sep
+    if(os.path.exists(path)):
+        filelist=get_all_file(path)
+    else:
+        mylog.warning('no path!')
     #get es list
     es = ESclient(server =serverNum,port=dport)
     ip_es_list = es.get_es_ip(index,gte,lte,aggs_name)
-    try:
-        #check each file
-        for fname in filelist:
-            fpath=path+fname
-            dataset=load_dict(fpath)
-            if(dataset):
-                msg=dataset[dataset.keys()[0]]
-                #get match result
-                fullmatch,segmentmatch,subnetlpm,subnetfull=treatip(dataset,ip_es_list)
-                insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetlpm,subnetfull,dataset)
-    except Exception, e:
-        mylog.error(e)
+    if(filelist):
+        try:
+            #check each file
+            for fname in filelist:
+                fpath=path+fname
+                dataset=load_dict(fpath)
+                if(dataset):
+                    msg=dataset[dataset.keys()[0]]
+                    #get match result
+                    fullmatch,segmentmatch,subnetlpm,subnetfull=treatip(dataset,ip_es_list)
+                    insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetlpm,subnetfull,dataset)
+        except Exception, e:
+            mylog.error(e)
+    else:
+        mylog.warning('no files!')
 
 
 if __name__ == '__main__':

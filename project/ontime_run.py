@@ -100,6 +100,8 @@ def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
         if(tday!=datetime.datetime.now().date()):
             flgnum=0 # reset flgnum per day
             tday=datetime.datetime.now().date()
+            dirpath = parser_config.get_store_path()[1] + str(tday) + os.path.sep
+            os.mkdir(dirpath)
         while datetime.datetime.now() < startTime:
             #print('time sleep...')
             mylog.info("time sleep...")
