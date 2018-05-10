@@ -105,6 +105,7 @@ def load_dict(filedir):
 	'''
 	加载本地的json文件
 	'''
+	dict1={}
 	try:
 		with open(filedir,'r') as f:
 			dict1=json.loads(f.read())

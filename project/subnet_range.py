@@ -83,7 +83,7 @@ def subnet_lpm(subnet,es_ip):
             ipstr1='.'.join(newip1)
             lpm.insert_rule(ipstr1)
             newip2=[]
-            ip_num[2]=ip_num[2]&0
+            ip_num[2]=ip_num[2]&254
             newip2.append(str(ip_num[0]))
             newip2.append(str(ip_num[1]))
             newip2.append(str(ip_num[2]))
