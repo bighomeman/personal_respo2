@@ -19,7 +19,7 @@ def saveToJSON(dict1,path,name):
     mylog=blacklist_tools.getlog()
     file_name = getsavepath(path,name)
     try:
-        with open(file_name,'a') as f:
+        with open(file_name,'w') as f:
             f.write(json.dumps(dict1))
     except IOError:
         print 'save Error'
