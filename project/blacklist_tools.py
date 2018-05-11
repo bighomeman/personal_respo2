@@ -137,7 +137,7 @@ def create_Trie(blacklist):
 def getlog():
 	mylog = logging.getLogger()
 	if len(mylog.handlers) == 0:  # just only one handler
-		level = logging.INFO
+		level = logging.DEBUG
 		filename = os.getcwd() + os.path.sep + 'data' + os.path.sep +'log'+ os.path.sep+ 'testlog'
 		format = '%(asctime)s %(levelname)-8s: %(message)s'
 		hdlr = TimedRotatingFileHandler(filename, "D", 1, 0)
