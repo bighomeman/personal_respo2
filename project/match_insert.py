@@ -215,6 +215,7 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
         filelist=get_all_file(path)
     else:
         mylog.warning('no path!')
+        filelist=[]
     #get es list
     es = ESclient(server =serverNum,port=dport)
     ip_es_list = es.get_es_ip(index,gte,lte,aggs_name)

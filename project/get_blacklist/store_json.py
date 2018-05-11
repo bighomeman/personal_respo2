@@ -4,11 +4,13 @@ import datetime
 import sys,os
 sys.path.append('..')
 from project import parser_config
+from project import blacklist_tools
 
 def store_json(dict,name):
 	'''
 	保存为json
 	'''
+	mylog=blacklist_tools.getlog()
 	tday = datetime.datetime.now().date()
 	file_name = name+ '.json'
 	savepath=parser_config.get_store_path()[1]+str(tday)+os.path.sep+file_name
@@ -17,7 +19,8 @@ def store_json(dict,name):
 		with open(savepath,'w') as f:
 			f.write(json.dumps(dict))
 	except IOError:
-		print 'Error'
+		# print 'store_json Error'
+		mylog.error('change date time!download again!')
 
 if __name__ == '__main__':
 	dict={}
