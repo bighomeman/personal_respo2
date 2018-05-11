@@ -114,6 +114,7 @@ def treatip(dataset,es_ip):
         mylog.info('finish lpm match')
     if(1==flg_full):
         #subnet match by zhou, parameters are snlist and es_ip
+        mylog.info('sndict size: %d'%len(sndict))
         mylog.info('start range subnet match')
         subnet_full=subnet_range.subnet_range_match(sndict,sn_lte16,es_ip)
         mylog.info('finish range subnet match')

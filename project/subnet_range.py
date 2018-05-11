@@ -46,6 +46,7 @@ def subnet_to_binary(num):
 
 #ip is string for single xxx.xxx.xxx.xxx/XX, subnet is number
 def subnet_lpm(subnet,es_ip):
+    mylog=blacklist_tools.getlog()
     lpm.init()
     sndict = {}
     fpath = parser_config.get_store_path()[1]
@@ -104,6 +105,7 @@ def subnet_lpm(subnet,es_ip):
             #netMask>16 and not in [16,23,24,25],save them
             sndict[sn]=subnet[sn]
 
+    mylog.info('lpm data size: %d'%len(lpmdict))
     #save
     snpath=getsavepath(fpath,'remain_subnet')
     ltepath=getsavepath(fpath,'lte16_subnet')
