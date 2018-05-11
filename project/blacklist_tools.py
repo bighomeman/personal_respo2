@@ -89,7 +89,7 @@ def saveAsJSON(date,dict1,path,name):
 		with open(file_name,'w') as f:
 			f.write(json.dumps(dict1))
 	except IOError:
-		print 'Error'
+		print 'saveAsJSON Error'
 
 def temp_store(dict,name):
 	'''
@@ -100,7 +100,7 @@ def temp_store(dict,name):
 		with open(file_name,'w') as f:
 			f.write(json.dumps(dict))
 	except IOError:
-		print 'Error'
+		print 'temp_store Error'
 
 def load_dict(filedir):
 	'''
@@ -111,7 +111,7 @@ def load_dict(filedir):
 		with open(filedir,'r') as f:
 			dict1=json.loads(f.read())
 	except IOError:
-		print 'Error'
+		print 'load_dict Error'
 	return dict1
 
 def insert(Trie,element):

@@ -32,7 +32,7 @@ def update_blacklist_module(flgnum):
 
 def main(tday,flgnum):
     mylog=blacklist_tools.getlog()
-    # print("Starting update command."), time.ctime()
+    print("Starting update command."), time.ctime()
     mylog.info("Starting update command.")
     # dirpath=".\data\\%s\\"%tday
     dirpath=parser_config.get_store_path()[1]+str(tday)+os.path.sep

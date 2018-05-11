@@ -69,7 +69,7 @@ def checkES(startTime,indx,aggs_name,serverNum,dport,tday):
     # new check function
     mylog=blacklist_tools.getlog()
     try:
-        # print("Starting check command."), time.ctime()
+        print("Starting check command."), time.ctime()
         mylog.info("Starting check command.")
         # execute the command
         gte = (startTime - delta).strftime('%Y-%m-%d %H:%M:%S')
