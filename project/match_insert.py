@@ -115,6 +115,7 @@ def treatip(dataset,es_ip):
     if(1==flg_full):
         #subnet match by zhou, parameters are snlist and es_ip
         mylog.info('sndict size: %d'%len(sndict))
+        mylog.info('sn_lte16 size: %d' % len(sn_lte16))
         mylog.info('start range subnet match')
         subnet_full=subnet_range.subnet_range_match(sndict,sn_lte16,es_ip)
         mylog.info('finish range subnet match')
@@ -226,7 +227,7 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
     es = ESclient(server =serverNum,port=dport)
     mylog.info('connected with es')
     ip_es_list = es.get_es_ip(index,gte,lte,aggs_name)
-    mylog.info('get es data')
+    mylog.info('get es data,data size:%d'%len(ip_es_list))
     if(filelist):
         try:
             #check each file
