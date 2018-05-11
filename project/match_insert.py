@@ -109,14 +109,14 @@ def treatip(dataset,es_ip):
     flg_lpm,flg_full=parser_config.get_method()
     if(1==flg_lpm):
         # subnet match by lpm,subnet_lpm is match results;sndict and sn_lte16 is original subnet data
-        mylog.debug('start lpm match')
+        mylog.info('start lpm match')
         subnet_lpm,sndict,sn_lte16=subnet_range.subnet_lpm(subnet,es_ip)
-        mylog.debug('finish lpm match')
+        mylog.info('finish lpm match')
     if(1==flg_full):
         #subnet match by zhou, parameters are snlist and es_ip
-        mylog.debug('start range subnet match')
+        mylog.info('start range subnet match')
         subnet_full=subnet_range.subnet_range_match(sndict,sn_lte16,es_ip)
-        mylog.debug('finish range subnet match')
+        mylog.info('finish range subnet match')
     # return match results
     return fullmatchlist,segmentlist,subnet_lpm,subnet_full
 
@@ -223,13 +223,13 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
         filelist=[]
     #get es list
     es = ESclient(server =serverNum,port=dport)
-    mylog.debug('connected with es')
+    mylog.info('connected with es')
     ip_es_list = es.get_es_ip(index,gte,lte,aggs_name)
-    mylog.debug('get es data')
+    mylog.info('get es data')
     if(filelist):
         try:
             #check each file
-            mylog.debug('load data')
+            mylog.info('load data from download files')
             for fname in filelist:
                 fpath=path+fname
                 dataset=load_dict(fpath)
