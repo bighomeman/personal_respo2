@@ -3,6 +3,9 @@
 
 import datetime
 import json
+import os
+import logging
+from logging.handlers import TimedRotatingFileHandler
 
 def judge_level(fp,status):
 	'''
@@ -86,7 +89,7 @@ def saveAsJSON(date,dict1,path,name):
 		with open(file_name,'w') as f:
 			f.write(json.dumps(dict1))
 	except IOError:
-		print 'Error'
+		print 'saveAsJSON Error'
 
 def temp_store(dict,name):
 	'''
@@ -97,17 +100,18 @@ def temp_store(dict,name):
 		with open(file_name,'w') as f:
 			f.write(json.dumps(dict))
 	except IOError:
-		print 'Error'
+		print 'temp_store Error'
 
 def load_dict(filedir):
 	'''
 	加载本地的json文件
 	'''
+	dict1={}
 	try:
 		with open(filedir,'r') as f:
 			dict1=json.loads(f.read())
 	except IOError:
-		print 'Error'
+		print 'load_dict Error'
 	return dict1
 
 def insert(Trie,element):
@@ -130,3 +134,16 @@ def create_Trie(blacklist):
 		domainTrie=insert(domainTrie,domain)
 	return domainTrie
 
+def getlog():
+	mylog = logging.getLogger()
+	if len(mylog.handlers) == 0:  # just only one handler
+		level = logging.INFO
+		filename = os.getcwd() + os.path.sep + 'data' + os.path.sep +'log'+ os.path.sep+ 'testlog'
+		format = '%(asctime)s %(levelname)-8s: %(message)s'
+		hdlr = TimedRotatingFileHandler(filename, "D", 1, 0)
+		hdlr.suffix = "%Y%m%d.log"
+		fmt = logging.Formatter(format)
+		hdlr.setFormatter(fmt)
+		mylog.addHandler(hdlr)
+		mylog.setLevel(level)
+	return mylog

@@ -4,6 +4,7 @@
 import requests
 from store_json import store_json
 from lxml import etree
+import blacklist_tools
 
 
 def MiningServerIPList():
@@ -18,9 +19,9 @@ def MiningServerIPList():
     ip_dict = {}
     for ip in result:
         ip_dict[ip] ={
-            'type':'mining pool',
-            'source':'github.com/ZeroDot1/CoinBlockerLists/blob/master/MiningServerIPList',
-            'level':'CRITICAL',
+            'subtype':'mining_pool',
+            'desc_subtype':'mining pool ip:{};source:github.com/ZeroDot1/CoinBlockerLists/blob/master/MiningServerIPList'.format(ip),
+            'level':'INFO',
             'fp':'unknown',
             'status':'unknown',
             'date':date
@@ -29,8 +30,10 @@ def MiningServerIPList():
 
 def main():
     dict = MiningServerIPList()
+    mylog=blacklist_tools.getlog()
     print len(dict.keys())
     store_json(dict, 'MiningServerIPList')
+    mylog.info("update mining pool!")
 
 if __name__=="__main__":
     main()
