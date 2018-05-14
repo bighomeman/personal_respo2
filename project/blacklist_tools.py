@@ -5,6 +5,7 @@ import datetime
 import json
 import os
 import logging
+from logging.handlers import TimedRotatingFileHandler
 
 def judge_level(fp,status):
 	'''
@@ -134,8 +135,15 @@ def create_Trie(blacklist):
 	return domainTrie
 
 def getlog():
-	tday = datetime.datetime.now().date()
-	logfile = os.getcwd() + os.path.sep + 'data' + os.path.sep +'log'+ os.path.sep+ 'testlog-{}.log'.format(str(tday))
-	formatter1 = '%(asctime)s %(levelname)-8s: %(message)s'
-	logging.basicConfig(filename=logfile,level=logging.INFO,format=formatter1)
-	return logging
+	mylog = logging.getLogger()
+	if len(mylog.handlers) == 0:  # 避免重复
+		level = logging.INFO
+		filename = os.getcwd() + os.path.sep + 'data' + os.path.sep +'log'+ os.path.sep+ 'testlog'
+		format = '%(asctime)s %(levelname)-8s: %(message)s'
+		hdlr = TimedRotatingFileHandler(filename, "D", 1, 0)
+		hdlr.suffix = "%Y%m%d.log"
+		fmt = logging.Formatter(format)
+		hdlr.setFormatter(fmt)
+		mylog.addHandler(hdlr)
+		mylog.setLevel(level)
+	return mylog
