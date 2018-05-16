@@ -88,13 +88,14 @@ def checkES(startTime,indx,aggs_name,serverNum,dport,tday):
 
 def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
     # new running procedure
+    updatetime=datetime.datetime.now()
     startTime = entertime
     # beginTime = datetime.datetime.strptime(begin, '%Y-%m-%d %H:%M:%S')
     # flgnum is the running times per day
     flgnum=0
     # get format: "yy-mm-dd"
     tday=datetime.datetime.now().date()
-    runtime=0 # elapsed time of whole process,included check and merge
+    # runtime=0 # elapsed time of whole process,included check and merge
     mylog=blacklist_tools.getlog()
     while True:
         if(tday!=datetime.datetime.now().date()):
@@ -105,16 +106,18 @@ def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
         while datetime.datetime.now() < startTime:
             #print('time sleep...')
             mylog.info("time sleep...")
-            time.sleep(delta.seconds-runtime)
+            time.sleep((startTime-datetime.datetime.now()).total_seconds())
         try:
-            st=time.clock()
+            # st=time.clock()
             #update source dataset
-            update_blacklist.main(tday,flgnum)
+            if(datetime.datetime.now()>updatetime):
+                update_blacklist.main(tday,flgnum)
+                updatetime=updatetime+delta
             # check interval time is 5mins
             checkES(startTime,indx,aggs_name,serverNum,dport,tday)
             startTime = startTime + delta
             flgnum+=1
-            runtime=time.clock()-st# get the time of whole process
+            # runtime=time.clock()-st# get the time of whole process
         except Exception, e:
             # print e
             mylog.error(e)

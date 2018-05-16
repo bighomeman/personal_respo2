@@ -93,7 +93,7 @@ step5: lpm match and subnet full match
 '''
 def treatip(dataset,es_ip):
     mylog=blacklist_tools.getlog()
-    full,segment,subnet=treat_ip.separate_ip(dataset)
+    full,segment,subnet=treat_ip.separate_ip(dataset)#dataset is dict
     # match procedure
     # full match
     full_list = full.keys()
@@ -286,6 +286,7 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
             filelist = get_all_file(blackpath)
             # 黑名单处理与普通文件不一样。
             checkAndInsert(blackpath,filelist,ip_es_list,index,aggs_name,timestamp,serverNum,dport)
+
         else:
             mylog.info('no self_blacklist_path')
 
