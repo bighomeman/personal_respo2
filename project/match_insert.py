@@ -248,16 +248,23 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
     while(cnt<8):
         if(os.path.exists(path)):
             filelist=get_all_file(path)
+            break
         elif cnt==7:
             #default file path
-            path=''
-            filelist = get_all_file(path)
+            dflg, defaultpath = parser_config.get_self_filelist('defaultlist')
+            if(dflg==1):
+                filelist = get_all_file(defaultpath)
+            else:
+                filelist=[]
+            break
         else:
             # check last 7 days file
             lday=tday+datetime.timedelta(-1)
             path = parser_config.get_store_path()[1] + str(lday) + os.path.sep
+            cnt=cnt+1
             # mylog.warning('no path!')
             # filelist=[]
+
     #get es list
     es = ESclient(server =serverNum,port=dport)
     mylog.info('connected with es')

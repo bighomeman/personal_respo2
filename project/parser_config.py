@@ -1,5 +1,6 @@
 import ConfigParser
 import re,datetime,os
+import blacklist_tools
 
 cp = ConfigParser.ConfigParser()
 cp.read("blacklist_match.conf")
@@ -65,14 +66,20 @@ def get_method():
     return flg_lpm,flg_full
 
 def get_self_filelist(keywords):
-    # optionname must be whitelist or blacklist
+    # optionname must be whitelist or blacklist or defaultlist
+    mylog=blacklist_tools.getlog()
     optionname='self_'+keywords+'_path'
-    source_store_path_key=cp.options(optionname)
-    #value=cp.get(sectionName,keyword)
-    flg=cp.getint(optionname,source_store_path_key[0])
-    bpath=cp.get(optionname,source_store_path_key[1])
-    path=get_store_path()[1]+bpath+os.path.sep
-    return flg,path
+    try:
+        source_store_path_key=cp.options(optionname)
+        #value=cp.get(sectionName,keyword)
+        flg=cp.getint(optionname,source_store_path_key[0])
+        bpath=cp.get(optionname,source_store_path_key[1])
+        path=get_store_path()[1]+bpath+os.path.sep
+        return flg,path
+    except Exception,e:
+        mylog.error('config file error!')
+        return 0,''
+
 
 
 # print cp.sections
