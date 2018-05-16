@@ -147,3 +147,9 @@ def getlog():
 		mylog.addHandler(hdlr)
 		mylog.setLevel(level)
 	return mylog
+
+def load_whitelist():
+	pass
+
+def load_blacklist():
+	pass
