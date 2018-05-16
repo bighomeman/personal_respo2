@@ -26,7 +26,7 @@ def ssl_abuse():
                 'level':'INFO',
                 'fp':'unknown',
                 'status':'unknown',
-                'dport':long(lis[1]),
+                'dport':int(lis[1]),
                 'mapping_ip':lis[0],
                 'date' : time.strftime('%Y-%m-%d',time.localtime(time.time()))
             }
