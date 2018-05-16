@@ -21,7 +21,7 @@ def ssl_abuse():
         else:
             ip_dict[line] = {
                 'subtype':'Feodo_C&C',
-                'desc_subtype':'Feodo C&C ;source:https://feodotracker.abuse.ch/blocklist/?download=ipblocklist',
+                'desc_subtype':'Feodo C&C ip;source:https://feodotracker.abuse.ch/blocklist/?download=ipblocklist',
                 'level':'INFO',
                 'fp':'unknown',
                 'status':'unknown',
