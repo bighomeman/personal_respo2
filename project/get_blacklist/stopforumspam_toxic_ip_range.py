@@ -4,7 +4,7 @@
 from bs4 import BeautifulSoup
 import requests,time
 from store_json import store_json
-import blacklist_tools
+from project import blacklist_tools
 
 def stopforumspam_toxic_ip_range():
     http = requests.get('http://www.stopforumspam.com/downloads/toxic_ip_range.txt')
@@ -17,10 +17,12 @@ def stopforumspam_toxic_ip_range():
         # print line
         ip_dict[line] = {
             'subtype':'spam',
-            'desc_subtype':'spam ip:{};source:http://www.stopforumspam.com/downloads/toxic_ip_range.txt'.format(line),
+            'desc_subtype':'spam ip;source:http://www.stopforumspam.com/downloads/toxic_ip_range.txt',
             'level':'INFO',
             'fp':'unknown',
             'status':'unknown',
+            'dport': -1,
+            'mapping_ip': line,
             'date' : time.strftime('%Y-%m-%d',time.localtime(time.time()))
         }
         # print ip_dict

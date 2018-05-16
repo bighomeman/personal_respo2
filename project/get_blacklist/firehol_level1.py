@@ -15,10 +15,12 @@ def firehol_level1():
         # print line
         ip_dict[line] = {
             'subtype':'suspect',
-            'desc_subtype':'suspect ip:{};source:iplists.firehol.org/files/firehol_level1.netset'.format(line),
+            'desc_subtype':'suspect ip;source:iplists.firehol.org/files/firehol_level1.netset',
             'level':'INFO',
             'fp':'unknown',
             'status':'unknown',
+            'dport': -1,
+            'mapping_ip': line,
             'date' : time.strftime('%Y-%m-%d',time.localtime(time.time()))
         }
     return ip_dict

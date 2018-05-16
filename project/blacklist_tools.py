@@ -140,7 +140,7 @@ def getlog():
 		level = logging.INFO
 		filename = os.getcwd() + os.path.sep + 'data' + os.path.sep +'log'+ os.path.sep+ 'testlog'
 		format = '%(asctime)s %(levelname)-8s: %(message)s'
-		hdlr = TimedRotatingFileHandler(filename, "D", 1, 0)
+		hdlr = TimedRotatingFileHandler(filename, "midnight", 1, 0)
 		hdlr.suffix = "%Y%m%d.log"
 		fmt = logging.Formatter(format)
 		hdlr.setFormatter(fmt)

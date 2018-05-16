@@ -1,5 +1,5 @@
 import ConfigParser
-import re,datetime
+import re,datetime,os
 
 cp = ConfigParser.ConfigParser()
 cp.read("blacklist_match.conf")
@@ -63,6 +63,18 @@ def get_method():
     flg_lpm = cp.getint('subnet_methods', source_store_path_key[0])
     flg_full = cp.getint('subnet_methods', source_store_path_key[1])
     return flg_lpm,flg_full
+
+def get_self_filelist(keywords):
+    # optionname must be whitelist or blacklist
+    optionname='self_'+keywords+'_path'
+    source_store_path_key=cp.options(optionname)
+    #value=cp.get(sectionName,keyword)
+    flg=cp.getint(optionname,source_store_path_key[0])
+    bpath=cp.get(optionname,source_store_path_key[1])
+    path=get_store_path()[1]+bpath+os.path.sep
+    return flg,path
+
+
 # print cp.sections
 #cun period
 #############################################################################################################################

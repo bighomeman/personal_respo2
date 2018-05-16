@@ -14,13 +14,15 @@ def bitnodes():
     result = neir_json['nodes'].keys()
     ip_dict = {}
     for ip_port in result:
-        ip = ip_port.split(':')[0]
-        ip_dict[ip] ={
+        iplis = ip_port.split(':')# iplis=[ip,port]
+        ip_dict[iplis[0]] ={
             'subtype':'mining_pool',
-            'desc_subtype':'mining pool ip:{};source:bitnodes.earn.com/api/v1/snapshots/latest/'.format(ip),
+            'desc_subtype':'mining pool ip;source:bitnodes.earn.com/api/v1/snapshots/latest/',
             'level':'INFO',
             'fp':'unknown',
             'status':'unknown',
+            'dport': long(iplis[1]),
+            'mapping_ip': iplis[0],
             'date': timestamp_datetime(neir_json['nodes'][ip_port][2])
         }
     return ip_dict

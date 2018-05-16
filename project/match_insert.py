@@ -97,9 +97,9 @@ def treatip(dataset,es_ip):
     # match procedure
     # full match
     full_list = full.keys()
-    # return fullmatchlist
+    # return fullmatchlist,type is list
     fullmatchlist=treat_ip.ip_full_match(full_list, es_ip)
-    # segment match, segmentlist:[{},{},...]
+    # segment match, segmentlist:[{ip:ipsegment},{},...]
     segmentlist=treat_ip.int_ip_range(segment,es_ip)
     subnet_lpm = {}
     subnet_full = {}
@@ -119,6 +119,20 @@ def treatip(dataset,es_ip):
         mylog.info('start range subnet match')
         subnet_full=subnet_range.subnet_range_match(sndict,sn_lte16,es_ip)
         mylog.info('finish range subnet match')
+    #whitelist
+    wlflg, whitepath = parser_config.get_self_filelist('whitelist')
+    if(wlflg==1):
+        #get whilelist
+        if (os.path.exists(whitepath)):
+            filelist = get_all_file(whitepath)
+            for fname in filelist:
+                fpath = whitepath + fname
+                whitedata = load_dict(fpath)
+                #filter procedure
+                fullmatchlist, segmentlist, subnet_lpm, subnet_full=treat_ip.whitelist_filter(fullmatchlist,segmentlist,subnet_lpm,subnet_full,whitedata)
+        else:
+            mylog.info('no self_whitelist_path')
+
     # return match results
     return fullmatchlist,segmentlist,subnet_lpm,subnet_full
 
@@ -128,6 +142,7 @@ def treatip(dataset,es_ip):
 def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetlpm,subnetfull,msg):
     es_insert = ESclient(server=serverNum, port=dport)
     mylog=blacklist_tools.getlog()
+    #white list filter ips
     if len(fullmatch) > 0:
         for i in range(len(fullmatch)):
             doc = {}
@@ -209,6 +224,17 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
         print 'subnet_full_insert'
         mylog.info('subnet_full_insert')
 
+def checkAndInsert(path,filelist,ip_es_list,index,aggs_name,timestamp,serverNum,dport):
+    # check each file
+    for fname in filelist:
+        fpath = path + fname
+        dataset = load_dict(fpath)
+        if (dataset):
+            msg = dataset[dataset.keys()[0]]
+            # get match result
+            fullmatch, segmentmatch, subnetlpm, subnetfull = treatip(dataset,ip_es_list)
+            insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetlpm,subnetfull,dataset)
+
 
 '''
 step1: get the saved file
@@ -218,11 +244,20 @@ step3: insert the threat info into es
 def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
     mylog = blacklist_tools.getlog()
     path=parser_config.get_store_path()[1]+str(tday)+os.path.sep
-    if(os.path.exists(path)):
-        filelist=get_all_file(path)
-    else:
-        mylog.warning('no path!')
-        filelist=[]
+    cnt=0
+    while(cnt<8):
+        if(os.path.exists(path)):
+            filelist=get_all_file(path)
+        elif cnt==7:
+            #default file path
+            path=''
+            filelist = get_all_file(path)
+        else:
+            # check last 7 days file
+            lday=tday+datetime.timedelta(-1)
+            path = parser_config.get_store_path()[1] + str(lday) + os.path.sep
+            # mylog.warning('no path!')
+            # filelist=[]
     #get es list
     es = ESclient(server =serverNum,port=dport)
     mylog.info('connected with es')
@@ -230,20 +265,20 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
     mylog.info('get es data,data size:%d'%len(ip_es_list))
     if(filelist):
         try:
-            #check each file
-            mylog.info('load data from download files')
-            for fname in filelist:
-                fpath=path+fname
-                dataset=load_dict(fpath)
-                if(dataset):
-                    msg=dataset[dataset.keys()[0]]
-                    #get match result
-                    fullmatch,segmentmatch,subnetlpm,subnetfull=treatip(dataset,ip_es_list)
-                    insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetlpm,subnetfull,dataset)
+            #check each file and insert match results
+            checkAndInsert(path,filelist,ip_es_list,index,aggs_name,timestamp,serverNum,dport)
         except Exception, e:
             mylog.error(e)
     else:
         mylog.warning('no files!')
+    #blacklist match
+    blflg,blackpath=parser_config.get_self_filelist('blacklist')
+    if(blflg==1):
+        if(os.path.exists(blackpath)):
+            filelist = get_all_file(blackpath)
+            checkAndInsert(blackpath,filelist,ip_es_list,index,aggs_name,timestamp,serverNum,dport)
+        else:
+            mylog.info('no self_blacklist_path')
 
 
 if __name__ == '__main__':

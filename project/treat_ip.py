@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 import re,json,sys,os
 from blacklist_tools import *
-from subnet_range import subnet_range
+from subnet_range import subnet_range,ip_split_num
 import socket,struct
+import lpm
 
 def separate_ip(ipdict):
     regex1 = re.compile('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
@@ -128,6 +129,64 @@ def ip_subnet_match(sublpm,es_ip):
 def ip_full_match(full_list,ip_es_list):
     match_result = set(full_list) & set(ip_es_list)
     return list(match_result)
+
+def whitelist_filter(fullmatch,segmentmatch,lpmmatch,lpmfullmatch,whitelist):
+    # treat whitelist data
+    white_full, white_segment, white_subnet = separate_ip(whitelist)
+    # filter each match result
+    lpm.init()
+    for sn in white_subnet:
+        subnet_split = sn.split('/')
+        ip_num =  ip_split_num(subnet_split[0])
+        netMask = int(subnet_split[1])
+        if (sn == '192.168.0.0/16' or sn == '172.16.0.0/12' or sn == '10.0.0.0/8'):  # 略过私网
+            continue
+            # return 'False'
+        elif (netMask == 16):
+            newip1 = []
+            ip_num[2] = ip_num[2] | 1
+            newip1.append(str(ip_num[0]))
+            newip1.append(str(ip_num[1]))
+            newip1.append('*')
+            newip1.append('*')
+            ipstr1 = '.'.join(newip1)
+            lpm.insert_rule(ipstr1)
+        elif (netMask == 24):
+            # /24处理
+            newip1 = []
+            newip1.append(str(ip_num[0]))
+            newip1.append(str(ip_num[1]))
+            newip1.append(str(ip_num[2]))
+            newip1.append('*')
+            ipstr1 = '.'.join(newip1)
+            lpm.insert_rule(ipstr1)
+        else:
+            # netMask>16 and not in [16,23,24,25],save them
+            continue
+
+    fullmatch_set = set(fullmatch) - (set(fullmatch)&set(white_full))
+    matchlist=[]
+    for ips in fullmatch_set:
+        ip_es_num = socket.ntohl(struct.unpack("I", socket.inet_aton(str(ips)))[0])
+        if(lpm.search_ip(ip_es_num)):
+            matchlist.append(ips)
+    fullmatch=list(fullmatch_set-set(matchlist))
+    #subnet
+    tmpmatch=[]
+    if(len(lpmmatch)>0):
+        for i in lpmmatch:
+            ips=i.keys()[0]
+            ip_es_num = socket.ntohl(struct.unpack("I", socket.inet_aton(str(ips)))[0])
+            if(ips in white_full or lpm.search_ip(ip_es_num)):
+                tmpmatch.append(i)
+        for ii in tmpmatch:
+            lpmmatch.remove(ii)
+
+    return fullmatch,segmentmatch,lpmmatch,lpmfullmatch
+
+
+
+
 
 # if __name__=="__main__":
 #     subnet = load_dict('.\data\\subnet-2018-03-23.json')
