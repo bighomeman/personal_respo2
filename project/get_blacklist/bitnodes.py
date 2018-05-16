@@ -21,7 +21,7 @@ def bitnodes():
             'level':'INFO',
             'fp':'unknown',
             'status':'unknown',
-            'dport': int(iplis[1]),
+            'dport': int(iplis[1].encode("utf-8")),
             'mapping_ip': iplis[0],
             'date': timestamp_datetime(neir_json['nodes'][ip_port][2])
         }
