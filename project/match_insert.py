@@ -287,7 +287,7 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
             # 黑名单处理与普通文件不一样。
             # check each file
             for fname in filelist:
-                fpath = path + fname
+                fpath = blackpath + fname
                 dataset = blacklist_tools.load_blacklist(fpath)
                 if (dataset):
                     # msg = dataset[dataset.keys()[0]]
