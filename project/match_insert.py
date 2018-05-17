@@ -127,8 +127,8 @@ def treatip(dataset,es_ip):
             filelist = get_all_file(whitepath)
             for fname in filelist:
                 fpath = whitepath + fname
-                #白名单读取方式不一样
-                whitedata = load_dict(fpath)
+                #白名单读取方式不一样, whitedata is dict
+                whitedata = blacklist_tools.load_whitelist(fpath)
                 #filter procedure
                 fullmatchlist, segmentlist, subnet_lpm, subnet_full=treat_ip.whitelist_filter(fullmatchlist,segmentlist,subnet_lpm,subnet_full,whitedata)
         else:
@@ -285,7 +285,17 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
         if(os.path.exists(blackpath)):
             filelist = get_all_file(blackpath)
             # 黑名单处理与普通文件不一样。
-            checkAndInsert(blackpath,filelist,ip_es_list,index,aggs_name,timestamp,serverNum,dport)
+            # check each file
+            for fname in filelist:
+                fpath = path + fname
+                dataset = blacklist_tools.load_blacklist(fpath)
+                if (dataset):
+                    # msg = dataset[dataset.keys()[0]]
+                    # get match result
+                    fullmatch, segmentmatch, subnetlpm, subnetfull = treatip(dataset, ip_es_list)
+                    insert_result(index, aggs_name, timestamp, serverNum, dport, fullmatch, segmentmatch, subnetlpm,
+                                  subnetfull, dataset)
+            # checkAndInsert(blackpath,filelist,ip_es_list,index,aggs_name,timestamp,serverNum,dport)
 
         else:
             mylog.info('no self_blacklist_path')

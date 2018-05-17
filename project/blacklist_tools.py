@@ -148,8 +148,22 @@ def getlog():
 		mylog.setLevel(level)
 	return mylog
 
-def load_whitelist():
-	pass
+def load_whitelist(whitepath):
+	mylog = getlog()
+	datadic = {}
+	if (os.path.exists(whitepath)):
+		# return  dataset,and type is dict
+		with open(whitepath, 'r') as bf:
+			allip = bf.read().split(',')
+			for ips in allip:
+				datadic[ips] = {
+					'subtype':'whitelist',
+					'desc_subtype': 'local whitelist ip'
+				}
+	else:
+		mylog.info('no whitelist path!')
+	return datadic
+
 
 def load_blacklist(blackpath):
 	mylog=getlog()
