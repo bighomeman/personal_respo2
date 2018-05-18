@@ -16,7 +16,7 @@ class ESclient(object):
 	def __init__(self,server='192.168.0.122',port='9222'):
 		self.__es_client=Elasticsearch([{'host':server,'port':port}])
 
-	def get_es_ip(self,index,gte,lte,aggs_name,size=500000):
+	def get_es_ip(self,index,gte,lte,aggs_name,time_zone,size=500000):
 		search_option={
             "size": 0,
             "query": {
@@ -34,7 +34,7 @@ class ESclient(object):
                                 "gte": gte,
                                 "lte": lte,
                                 "format": "yyyy-MM-dd HH:mm:ss",
-                                "time_zone":"+08:00"
+                                "time_zone":time_zone
                             }
                         }
                     }
@@ -242,7 +242,7 @@ step1: get the saved file
 step2: divide the data into 3 parts(ip_32/ip_seg/ip_subnet),and match each parts
 step3: insert the threat info into es
 '''
-def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
+def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport,time_zone):
     mylog = blacklist_tools.getlog()
     path=parser_config.get_store_path()[1]+str(tday)+os.path.sep
     cnt=0
@@ -269,7 +269,7 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport):
     #get es list
     es = ESclient(server =serverNum,port=dport)
     # mylog.info('connected with es')
-    ip_es_list = es.get_es_ip(index,gte,lte,aggs_name)
+    ip_es_list = es.get_es_ip(index,gte,lte,aggs_name,time_zone)
     # mylog.info('get es data,data size:%d'%len(ip_es_list))
     if(filelist):
         try:
