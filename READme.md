@@ -47,8 +47,8 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 <br>
 4.2 在XXX.py中编写完整的情报下载/清洗/存储过程，务必保证最终存储的数据格式如下：
 
-`
-{
+`{
+
     "ip1":
 
         {    #具体属性域请参考其他处理文件
