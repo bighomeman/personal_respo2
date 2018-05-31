@@ -49,7 +49,7 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 
 ` ` `
 {
-<br>
+
     "ip1":
 
         {    #具体属性域请参考其他处理文件
@@ -63,10 +63,15 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
     }，
 
     "ip2":
+
         {
+
             ... ...
+
         }，
+
         ... ... 
+
 }
 ` ` `
 <br>4.3 确定网络情报数据源的更新频率，在blacklist_match.conf文件中[parse_blacklist]下的fun1末尾添加“,XXX:frequency"
