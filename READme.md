@@ -47,7 +47,7 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 <br>
 4.2 在XXX.py中编写完整的情报下载/清洗/存储过程，务必保证最终存储的数据格式如下：
 
-` ` `
+` ` 
 {
 
     "ip1":
@@ -60,7 +60,7 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 
              ... .... 
 
-    }，
+        }，
 
     "ip2":
 
@@ -73,6 +73,6 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
         ... ... 
 
 }
-` ` `
+` ` 
 <br>4.3 确定网络情报数据源的更新频率，在blacklist_match.conf文件中[parse_blacklist]下的fun1末尾添加“,XXX:frequency"
 <br>
