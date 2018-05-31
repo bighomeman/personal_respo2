@@ -7,7 +7,7 @@ from store_json import store_json
 from project import blacklist_tools
 
 # update per 5mins
-def ssl_abuse():
+def feodo_ip():
     http = requests.get('https://feodotracker.abuse.ch/blocklist/?download=ipblocklist')
     neir = http.text
     lines = neir.split('\n')
@@ -33,10 +33,10 @@ def ssl_abuse():
     return ip_dict
 
 def main():
-    dict = ssl_abuse()
+    dict = feodo_ip()
     mylog=blacklist_tools.getlog()
     print len(dict)
-    store_json(dict,'ssl_abuse')
+    store_json(dict,'feodo_ip')
     mylog.info("update ssl_abuse!")
     # print 'update successfully'
 

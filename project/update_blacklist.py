@@ -19,10 +19,12 @@ def update_blacklist_module(flgnum):
     for filename in parser_blacklist.keys():
         times=int(parser_blacklist[filename])
         # check the update frequency
+        mylog.info("check frequency.")
         if(flgnum%times==0):
             # command='python %s'%fpath
             try:
                 df = __import__('get_blacklist.{}'.format(filename), fromlist=True)
+                mylog.info("start update {} ".format(filename))
                 df.main()
                 # status=os.system(command)
                 # print status
