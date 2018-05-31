@@ -34,12 +34,13 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 <br>2.3 若需启动本地黑名单，请在[self_blacklist_path]下令blacklist_flg=1，path对应于本地黑名单的默认目录；
 白名单和默认情报源的启动设置与黑名单一致。
 <br>
-3.安装完成对应python版本以及依赖包后，进入/project目录下使用以下命令启动程序：
+<br>3.安装完成对应python版本以及依赖包后，进入/project目录下使用以下命令启动程序：
 <br>nohup python ontime_run.py & 
 <br>【再次回车】
 <br>使用以下命令查看日志文件：
 <br>tail -50f ./data/log/testlog
 <br>日志文件会记录程序运行中的相关信息，当看到日志文件不断写入内容后表示程序已经运行。
+<br>
 <br>
 4.增加网络情报源的方法
 <br>4.1 在/get_blacklist目录下新建一个处理文件，假设为XXX.py；
