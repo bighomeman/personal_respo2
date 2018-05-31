@@ -49,12 +49,19 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 
 ` ` `
 {
+
     "ip1":
+
         {    #具体属性域请参考其他处理文件
+
            “subtype”：“mining_pool”
+
             “desc_subtype”：“... ... "
+
              ... .... 
+
     }，
+
     "ip2":
         {
             ... ...
