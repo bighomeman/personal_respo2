@@ -1,3 +1,4 @@
 ip,subtype,source
 89.185.44.100,C&C,iplists.firehol.org/files/firehol_level1.netset
-72.52.4.122,phishing,iplists.firehol.org/files/firehol_level1.netset
+72.52.4.122,malware,iplists.firehol.org/files/firehol_level1.netset
+67.229.99.82,C&C,local_intelligence
