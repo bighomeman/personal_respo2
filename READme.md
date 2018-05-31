@@ -1,23 +1,23 @@
 # personal_respo2
-前言
-本程序用于获取网络情报，针对imap中记录的目的ip地址进行检查，若目的ip与情报中出现的ip匹配，则发出告警信息，并将告警信息写入ES中。
+前言<br>
+本程序用于获取网络情报，针对imap中记录的目的ip地址进行检查，若目的ip与情报中出现的ip匹配，则发出告警信息，并将告警信息写入ES中。<br>
 
 本程序需在Linux环境下运行，基于python 2.7语法规范编写，主要的相关依赖包如下：
 json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、requests、bs4、lxml
-
+<br>
 本程序GitHub地址为：https://github.com/sh9369/personal_respo2
-
+<br>
 1. GitHub主页上使用zip打包下载得personal_respo2-master.zip，解压后得personal_respo2文件夹；或使用git clone 命令直接下载。主要的文件目录形式如下：
-personal_respo2:
-——project：程序主文件目录
-————data: 程序数据存放目录
-——————log：日志文件目录
-——————self_blacklist：本地黑名单文件目录
-——————self_defaultlist：本地默认情报源目录
-——————self_whitelist：本地白名单文件目录
-————get_blacklist：网络情报源处理文件存放目录
-——————MiningServerIPList.py：具体处理网络情报的文件
-——————  ......
+<br>personal_respo2:
+<br>——project：程序主文件目录
+<br>————data: 程序数据存放目录
+<br>——————log：日志文件目录
+<br>——————self_blacklist：本地黑名单文件目录
+<br>——————self_defaultlist：本地默认情报源目录
+<br>——————self_whitelist：本地白名单文件目录
+<br>————get_blacklist：网络情报源处理文件存放目录
+<br>——————MiningServerIPList.py：具体处理网络情报的文件
+<br>——————  ......
 ————lpm: lpm算法集成目录
 ————blacklist_match.conf：程序配置文件
 ————blacklist_tools：程序公共函数方法文件
