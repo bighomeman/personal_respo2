@@ -46,7 +46,7 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 <br>4.1 在/get_blacklist目录下新建一个处理文件，假设为XXX.py；
 <br>4.2 在XXX.py中编写完整的情报下载/清洗/存储过程，务必保证最终存储的数据格式如下：
 <br>{
-<br>`    `  "ip1":
+<br>`hello    `  "ip1":
 <br>`        `    {    #具体属性域请参考其他处理文件
 <br>`            `       “subtype”：“mining_pool”
 <br>`            `        “desc_subtype”：“... ... "
