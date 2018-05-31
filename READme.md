@@ -51,9 +51,9 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 {
 <br>
     "ip1":
-<br>
+
         {    #具体属性域请参考其他处理文件
-<br>
+
            “subtype”：“mining_pool”
 
             “desc_subtype”：“... ... "
