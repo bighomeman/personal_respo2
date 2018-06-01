@@ -205,6 +205,8 @@ class ESclient(object):
             dip=temp["_source"]["dip"]
             allrecord[dip]=temp["_source"]
         return allrecord
+    def secondcheck(self,gte2,lte,time_zone,dip):
+        return Second_check(self.__es_client, gte2, lte, time_zone, dip)
 
 '''
 checkAlert: 检查alert中关于c&c的info告警，获取dip
@@ -279,7 +281,7 @@ def main(startTime):
     allwarn={}# {ip:[],ip:[],...}
     try:
         for dip in diplist:
-            allwarn[dip]=Second_check(es,gte2,lte,time_zone,dip)
+            allwarn[dip]=es.secondcheck(gte2,lte,time_zone,dip)
     except Exception,e:
         mylog.error('second_check:{}'.format(e))
     #insert warning alert
