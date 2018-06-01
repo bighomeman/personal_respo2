@@ -153,7 +153,6 @@ class ESclient(object):
                 }
             }
         }
-
         search_result=self.__es_client.search(
             index=index,
             body=search_option
@@ -172,41 +171,40 @@ class ESclient(object):
             body=doc
         )
 
-def es_search(es,index,gte,lte,filetype,time_zone,querystr,rangetime,aggs):
-    search_option = {
-        "size": 0,
-        "query": {
-            "bool": {
-                "must": [
-                    {
-                        "query_string": querystr
-                    },
-                    {
-                        "range": rangetime
-                    }
-                ],
-                "must_not": []
-            }
-        },
-        "_source": {
-            "excludes": []
-        },
-        "aggs": {
-            "get": aggs
-            }
-    }
-
-    search_result = es.search(
-        index=index,
-        body=search_option
-    )
-    allrecord={}
-    clean_search_result = search_result['hits']["hits"]
-    for temp in clean_search_result:
-        #temp is dict
-        dip=temp["_source"]["dip"]
-        allrecord[dip]=temp["_source"]
-    return allrecord
+    def es_search_alert(self,index,gte,lte,filetype,time_zone,querystr,rangetime,aggs):
+        search_option = {
+            "size": 0,
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "query_string": querystr
+                        },
+                        {
+                            "range": rangetime
+                        }
+                    ],
+                    "must_not": []
+                }
+            },
+            "_source": {
+                "excludes": []
+            },
+            "aggs": {
+                "get": aggs
+                }
+        }
+        search_result = self.__es_client.search(
+            index=index,
+            body=search_option
+        )
+        allrecord={}
+        clean_search_result = search_result['hits']["hits"]
+        for temp in clean_search_result:
+            #temp is dict
+            dip=temp["_source"]["dip"]
+            allrecord[dip]=temp["_source"]
+        return allrecord
 
 '''
 checkAlert: 检查alert中关于c&c的info告警，获取dip
@@ -237,7 +235,7 @@ def checkAlert(index,gte,lte,time_zone,serverNum,dport):
     es = ESclient(server =serverNum,port=dport)
     # mylog.info('connected with es')
     ip_es_list = es.get_es_ip(index,gte,lte,filetype,time_zone,querystr,rangetime)
-    allalerts=es_search(es,index,gte,lte,filetype,time_zone,querystr,rangetime,aggs)
+    allalerts=es.es_search_alert(index,gte,lte,filetype,time_zone,querystr,rangetime,aggs)
     return ip_es_list,es,allalerts #dip
 
 
