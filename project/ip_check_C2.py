@@ -1,5 +1,5 @@
 #! /usr/bin/python
-# _*_ Coding:UTF-8 _*_
+# -*- coding: utf-8 -*-
 # author: songh
 
 from elasticsearch import Elasticsearch
@@ -94,12 +94,9 @@ def calc_MAD(datalist):
     median = calc_median(datalist)
     return calc_median([abs(data - median) for data in datalist])
 
-
-'''
-Second_check: 1）根据dip查找某段时间内所有与其通信的sip在每分钟flow计数；
-            2）根据flow计数的序列判断是否有异常
-return: 返回有问题的sip list
-'''
+# Second_check: 1）根据dip查找某段时间内所有与其通信的sip在每分钟flow计数；
+#             2）根据flow计数的序列判断是否有异常
+# return: 返回有问题的sip list
 def Second_check(es, gte, lte, time_zone, dip):
     res = get_date_flow(es=es, gte=gte, lte=lte, time_zone=time_zone, dip=dip)
     ret_siplist = []
@@ -168,16 +165,14 @@ class ESclient(object):
         return ip
 
     def es_index(self, doc):
-        '''
-        数据回插es的alert-*索引
-        '''
+        # 数据回插es的alert-*索引
         ret = self.__es_client.index(
             index='alert-{}'.format(datetime.datetime.now().strftime('%Y-%m-%d')),
             doc_type='netflow_v9',
             body=doc
         )
 
-def search(es,index,gte,lte,filetype,time_zone,querystr,rangetime,aggs):
+def es_search(es,index,gte,lte,filetype,time_zone,querystr,rangetime,aggs):
     search_option = {
         "size": 0,
         "query": {
@@ -218,7 +213,7 @@ checkAlert: 检查alert中关于c&c的info告警，获取dip
 '''
 def checkAlert(index,gte,lte,time_zone,serverNum,dport):
     querystr={
-        "query":"type:MAL_IP",#type:MAL_IP
+        "query":"type:MAL_IP",
         "analyze_wildcard": True
     }
     filetype='dip'
@@ -242,7 +237,7 @@ def checkAlert(index,gte,lte,time_zone,serverNum,dport):
     es = ESclient(server =serverNum,port=dport)
     # mylog.info('connected with es')
     ip_es_list = es.get_es_ip(index,gte,lte,filetype,time_zone,querystr,rangetime)
-    allalerts=search(es,index,gte,lte,filetype,time_zone,querystr,rangetime,aggs)
+    allalerts=es_search(es,index,gte,lte,filetype,time_zone,querystr,rangetime,aggs)
     return ip_es_list,es,allalerts #dip
 
 
