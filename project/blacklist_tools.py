@@ -170,17 +170,20 @@ def load_blacklist(blackpath):
 	datadic={}
 	if (os.path.exists(blackpath)):
 		#return  dataset,and type is dict
-		with open(blackpath,'r') as bf:
-			alllines=bf.read().split('\n')
-			del alllines[0]# alllines[0] :ip,subtype,source
-			for line in alllines:
-				linelis=line.split(',')
-				datadic[linelis[0]]={
-					'subtype': linelis[1],
-					'desc_subtype': '{} ip;source:{}'.format(linelis[1],linelis[2]),
-					'level': 'INFO',
-					'mapping_ip': linelis[0],
-				}
+		try:
+			with open(blackpath,'r') as bf:
+				alllines=bf.read().split('\n')
+				del alllines[0]# alllines[0] :ip,subtype,source
+				for line in alllines:
+					linelis=line.split(',')
+					datadic[linelis[0]]={
+						'subtype': linelis[1],
+						'desc_subtype': '{} ip;source:{}'.format(linelis[1],linelis[2]),
+						'level': 'INFO',
+						'mapping_ip': linelis[0],
+					}
+		except Exception,e:
+			mylog.error('load local blacklist:{}'.format(e))
 	else:
 		mylog.info('no blacklist path!')
 	return datadic

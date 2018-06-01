@@ -276,7 +276,7 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport,time_zone):
             #check each file and insert match results
             checkAndInsert(path,filelist,ip_es_list,index,aggs_name,timestamp,serverNum,dport)
         except Exception, e:
-            mylog.error(e)
+            mylog.error('check blacklist:{}'.format(e))
     else:
         mylog.warning('no files!')
     #blacklist match
@@ -288,13 +288,17 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport,time_zone):
             # check each file
             for fname in filelist:
                 fpath = blackpath + fname
+                mylog.info('start check local file:{}'.format(fname))
                 dataset = blacklist_tools.load_blacklist(fpath)
                 if (dataset):
                     # msg = dataset[dataset.keys()[0]]
                     # get match result
-                    fullmatch, segmentmatch, subnetlpm, subnetfull = treatip(dataset, ip_es_list)
-                    insert_result(index, aggs_name, timestamp, serverNum, dport, fullmatch, segmentmatch, subnetlpm,
+                    try:
+                        fullmatch, segmentmatch, subnetlpm, subnetfull = treatip(dataset, ip_es_list)
+                        insert_result(index, aggs_name, timestamp, serverNum, dport, fullmatch, segmentmatch, subnetlpm,
                                   subnetfull, dataset)
+                    except Exception,e:
+                        mylog.error('check local blacklist:{}'.format(e))
             # checkAndInsert(blackpath,filelist,ip_es_list,index,aggs_name,timestamp,serverNum,dport)
 
         else:
