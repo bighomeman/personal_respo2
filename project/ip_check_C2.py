@@ -218,7 +218,7 @@ checkAlert: 检查alert中关于c&c的info告警，获取dip
 '''
 def checkAlert(index,gte,lte,time_zone,serverNum,dport):
     querystr={
-        "query":"subtype:*C&C",
+        "query":"type:MAL_IP",#type:MAL_IP
         "analyze_wildcard": True
     }
     filetype='dip'
