@@ -112,8 +112,8 @@ def Second_check(es, gte, lte, time_zone, dip):
         date_dev = [datelist[i + 1] - datelist[i] for i in range(len(datelist) - 1)]
         #		print date_dev
         #		print flowlist
-        #		print calc_MAD(date_dev)
-        #		print calc_MAD(flowlist)
+        print calc_MAD(date_dev)
+        print calc_MAD(flowlist)
         if (calc_MAD(date_dev) <= 60000) and (calc_MAD(flowlist) <= 1):
             ret_siplist.append(sip_item["key"])
     return ret_siplist
@@ -257,6 +257,8 @@ def searchAndInsert(alerts,ipdict,es,mylog):
                 doc['level']="WARNING"
                 doc['sip']=tsip
                 es.es_index(doc)
+                mylog.info('insert WARNING!!!')
+    mylog.info('second check insert finished.')
 
 
 
@@ -275,6 +277,7 @@ def main(startTime):
     serverNum='localhost'
     dport='9200'
     #first step
+    mylog.info('start check alert info.')
     diplist,es,allalerts=checkAlert('alert-*',gte1,lte,time_zone,serverNum,dport)
     #second step
     delta2=datetime.timedelta(days=1)
