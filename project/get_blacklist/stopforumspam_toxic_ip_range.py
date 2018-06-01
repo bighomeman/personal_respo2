@@ -7,7 +7,7 @@ from store_json import store_json
 from project import blacklist_tools
 
 def stopforumspam_toxic_ip_range():
-    http = requests.get('http://www.stopforumspam.com/downloads/toxic_ip_range.txt')
+    http = requests.get('http://www.stopforumspam.com/downloads/toxic_ip_range.txt',verify=False)
     neir = http.text
     lines = neir.split('\n')
     del lines[-1]

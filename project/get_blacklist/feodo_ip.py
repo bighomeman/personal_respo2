@@ -8,7 +8,7 @@ from project import blacklist_tools
 
 # update per 5mins
 def feodo_ip():
-    http = requests.get('https://feodotracker.abuse.ch/blocklist/?download=ipblocklist')
+    http = requests.get('https://feodotracker.abuse.ch/blocklist/?download=ipblocklist',verify=False)
     neir = http.text
     lines = neir.split('\n')
     del lines[-1]

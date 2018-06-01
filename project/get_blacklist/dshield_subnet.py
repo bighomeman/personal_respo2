@@ -8,7 +8,7 @@ from project import blacklist_tools
 
 # update per 15mins
 def dshield_subnet():
-    http = requests.get('http://feeds.dshield.org/block.txt')
+    http = requests.get('http://feeds.dshield.org/block.txt',verify=False)
     neir = http.text
     lines = neir.split('\n')
     del lines[-1]

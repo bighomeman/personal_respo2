@@ -8,7 +8,7 @@ from project import blacklist_tools
 
 # update per 30mins
 def ZeuS_ip():
-    http = requests.get('https://zeustracker.abuse.ch/blocklist.php?download=badips')
+    http = requests.get('https://zeustracker.abuse.ch/blocklist.php?download=badips',verify=False)
     neir = http.text
     lines = neir.split('\n')
     del lines[-1]

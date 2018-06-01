@@ -8,7 +8,7 @@ from project import blacklist_tools
 
 
 def MiningServerIPList():
-    http = requests.get('https://github.com/ZeroDot1/CoinBlockerLists/blob/master/MiningServerIPList.txt')
+    http = requests.get('https://github.com/ZeroDot1/CoinBlockerLists/blob/master/MiningServerIPList.txt',verify=False)
     neir = http.text
     html = etree.HTML(neir)
     result = html.xpath('//td[starts-with(@id,"LC")]/text()')

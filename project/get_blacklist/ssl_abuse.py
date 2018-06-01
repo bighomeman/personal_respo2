@@ -8,7 +8,7 @@ from project import blacklist_tools
 
 # update per 15mins
 def ssl_abuse():
-    http = requests.get('https://sslbl.abuse.ch/blacklist/sslipblacklist.csv')
+    http = requests.get('https://sslbl.abuse.ch/blacklist/sslipblacklist.csv',verify=False)
     neir = http.text
     lines = neir.split('\n')
     del lines[-1]

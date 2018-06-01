@@ -8,7 +8,7 @@ from project import blacklist_tools
 
 def bitnodes():
     requests.adapters.DEFAULT_RETRIES = 5
-    http = requests.get('https://bitnodes.earn.com/api/v1/snapshots/latest/')
+    http = requests.get('https://bitnodes.earn.com/api/v1/snapshots/latest/',verify=False)
     neir = http.text
     neir_json = json.loads(neir)
     result = neir_json['nodes'].keys()
