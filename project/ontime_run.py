@@ -81,14 +81,16 @@ def checkES(startTime,indx,aggs_name,serverNum,dport,tday):
         else:
             time_zone = "%+03d:%02d" % (-(time.altzone / 3600), time.altzone % 3600 / 3600.0 * 60)
         timestamp = (startTime).strftime('%Y-%m-%dT%H:%M:%S.%f') + time_zone
-        match_insert.main(tday,indx,gte,lte,aggs_name,timestamp,serverNum,dport,time_zone)
+        all_ip=match_insert.main(tday,indx,gte,lte,aggs_name,timestamp,serverNum,dport,time_zone)
         # print("check finish."), time.ctime()
-        mylog.info("check finish.")
+        mylog.info("check finish.{}".format("="*20))
         print"="*40
+        return all_ip
 
     except Exception, e:
         # print e
         mylog.error(e)
+        return {}
 
 
 
