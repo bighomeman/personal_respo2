@@ -8,6 +8,7 @@ import match_insert
 import parser_config
 import update_blacklist
 import blacklist_tools
+import ip_check_C2
 
 second = datetime.timedelta(seconds=1)
 day = datetime.timedelta(days=1)
@@ -120,6 +121,10 @@ def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
                 updatetime=updatetime+delta
             # check interval time is 5mins
             checkES(startTime,indx,aggs_name,serverNum,dport,tday)
+            #IP second check for C&C
+            flg_C2=parser_config.get_ip_secondcheck()
+            if(flg_C2==1):
+                ip_check_C2.main(startTime)
             startTime = startTime + delta
             flgnum+=1
             # runtime=time.clock()-st# get the time of whole process

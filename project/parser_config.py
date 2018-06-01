@@ -80,7 +80,12 @@ def get_self_filelist(keywords):
         mylog.error('config file error!')
         return 0,''
 
-
+def get_ip_secondcheck():
+    # get subnet method
+    source_store_path_key = cp.options("ip_second_check")
+    # value=cp.get(sectionName,keyword)
+    ipSecondCheckC2 = cp.getint('ip_second_check', source_store_path_key[0])
+    return ipSecondCheckC2
 
 # print cp.sections
 #cun period

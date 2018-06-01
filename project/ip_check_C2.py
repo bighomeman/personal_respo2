@@ -1,0 +1,296 @@
+#! /usr/bin/python
+# _*_ Coding:UTF-8 _*_
+# author: songh
+
+from elasticsearch import Elasticsearch
+import time
+import datetime
+import blacklist_tools
+
+# !/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import json
+
+def get_date_flow(es, gte, lte, time_zone, dip):
+    search_option = {
+        "size": 0,
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "query_string": {
+                            "query": "dip:{}".format(dip),
+                            'analyze_wildcard': True
+                        }
+                    },
+                    {
+                        "range": {
+                            "@timestamp": {
+                                "gte": gte,
+                                "lte": lte,
+                                "format": "yyyy-MM-dd HH:mm:ss",
+                                "time_zone": time_zone
+                            }
+                        }
+                    }
+                ],
+                "must_not": []
+            }
+        },
+        "_source": {
+            "excludes": []
+        },
+        "aggs": {
+            "sip": {
+                "terms": {
+                    "field": "sip",
+                    "size": 100,
+                    "order": {
+                        "flow": "desc"
+                    }
+                },
+                "aggs": {
+                    "flow": {
+                        "sum": {
+                            "field": "flow"
+                        }
+                    },
+                    "date": {
+                        "date_histogram": {
+                            "field": "@timestamp",
+                            "interval": "1m",
+                            "time_zone": time_zone,
+                            "min_doc_count": 1
+                        },
+                        "aggs": {
+                            "flow": {
+                                "sum": {
+                                    "field": "flow"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    result = es.search(
+        index="tcp-*",
+        body=search_option
+    )
+    return result
+
+
+
+
+def calc_median(datalist):
+    datalist.sort()
+    half = len(datalist) // 2
+    return (datalist[half] + datalist[~half]) / 2.0
+
+
+def calc_MAD(datalist):
+    median = calc_median(datalist)
+    return calc_median([abs(data - median) for data in datalist])
+
+
+'''
+Second_check: 1）根据dip查找某段时间内所有与其通信的sip在每分钟flow计数；
+            2）根据flow计数的序列判断是否有异常
+return: 返回有问题的sip list
+'''
+def Second_check(es, gte, lte, time_zone, dip):
+    res = get_date_flow(es=es, gte=gte, lte=lte, time_zone=time_zone, dip=dip)
+    ret_siplist = []
+    # each sip_item has only one sip but many flows in different time
+    for sip_item in res["aggregations"]["sip"]["buckets"]:
+        datelist = []
+        flowlist = []
+        for item in sip_item["date"]["buckets"]:
+            datelist.append(item["key"])
+            flowlist.append(item["flow"]["value"])
+        if len(datelist) < 2:
+            continue
+        date_dev = [datelist[i + 1] - datelist[i] for i in range(len(datelist) - 1)]
+        #		print date_dev
+        #		print flowlist
+        #		print calc_MAD(date_dev)
+        #		print calc_MAD(flowlist)
+        if (calc_MAD(date_dev) <= 60000) and (calc_MAD(flowlist) <= 1):
+            ret_siplist.append(sip_item["key"])
+    return ret_siplist
+
+class ESclient(object):
+    def __init__(self,server='192.168.0.122',port='9222'):
+        self.__es_client=Elasticsearch([{'host':server,'port':port}])
+
+    def get_es_ip(self,index,gte,lte,aggs_name,time_zone,querystr,rangetime,size=500000):
+        search_option={
+            "size": 0,
+            "query": {
+              "bool": {
+                "must": [
+                    {
+                        "query_string": querystr
+                    },
+                    {
+                        "range": rangetime
+                    }
+                ],
+                "must_not": []
+              }
+            },
+            "_source": {
+                "excludes": []
+            },
+            "aggs": {
+                "get": {
+                    "terms": {
+                        "field": aggs_name,
+                        "size": size,
+                        "order": {
+                            "_count": "desc"
+                        }
+                    }
+                }
+            }
+        }
+
+        search_result=self.__es_client.search(
+            index=index,
+            body=search_option
+            )
+        clean_search_result = search_result['aggregations']["get"]['buckets']
+        ip = []
+        for temp in clean_search_result:
+            ip.append(temp['key'])
+        return ip
+
+    def es_index(self, doc):
+        '''
+        数据回插es的alert-*索引
+        '''
+        ret = self.__es_client.index(
+            index='alert-{}'.format(datetime.datetime.now().strftime('%Y-%m-%d')),
+            doc_type='netflow_v9',
+            body=doc
+        )
+
+def search(es,index,gte,lte,filetype,time_zone,querystr,rangetime,aggs):
+    search_option = {
+        "size": 0,
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "query_string": querystr
+                    },
+                    {
+                        "range": rangetime
+                    }
+                ],
+                "must_not": []
+            }
+        },
+        "_source": {
+            "excludes": []
+        },
+        "aggs": {
+            "get": aggs
+            }
+    }
+
+    search_result = es.search(
+        index=index,
+        body=search_option
+    )
+    allrecord={}
+    clean_search_result = search_result['hits']["hits"]
+    for temp in clean_search_result:
+        #temp is dict
+        dip=temp["_source"]["dip"]
+        allrecord[dip]=temp["_source"]
+    return allrecord
+
+'''
+checkAlert: 检查alert中关于c&c的info告警，获取dip
+'''
+def checkAlert(index,gte,lte,time_zone,serverNum,dport):
+    querystr={
+        "query":"subtype:*C&C",
+        "analyze_wildcard": True
+    }
+    filetype='dip'
+    rangetime={
+        "@timestamp": {
+            "gte": gte,
+            "lte": lte,
+            "format": "yyyy-MM-dd HH:mm:ss",
+            "time_zone":time_zone
+        }
+    }
+    aggs={
+      "date_histogram": {
+        "field": "@timestamp",
+        "interval": "30m",
+        "time_zone": time_zone,
+        "min_doc_count": 1
+      }
+    }
+    #get es list
+    es = ESclient(server =serverNum,port=dport)
+    # mylog.info('connected with es')
+    ip_es_list = es.get_es_ip(index,gte,lte,filetype,time_zone,querystr,rangetime)
+    allalerts=search(es,index,gte,lte,filetype,time_zone,querystr,rangetime,aggs)
+    return ip_es_list,es,allalerts #dip
+
+
+'''
+searchAndInsert:1)modified the record (level:warning,add sip)
+                2)insert to es
+'''
+def searchAndInsert(alerts,ipdict,es):
+    alert_dip=alerts.keys()
+    warning_dip=ipdict.keys()
+    for tmp in alert_dip:
+        if(tmp in warning_dip):
+            for tsip in ipdict[tmp]:
+                doc=alerts[tmp]
+                doc['level']="WARNING"
+                doc['sip']=tsip
+                es.es_index(doc)
+
+
+
+def main(startTime):
+    mylog=blacklist_tools.getlog()
+    # startTime=datetime.datetime.now()
+    delta1=datetime.timedelta(minutes=5)
+    gte1 = (startTime - delta1).strftime('%Y-%m-%d %H:%M:%S')
+    lte = (startTime).strftime('%Y-%m-%d %H:%M:%S')
+    time_zone = ''
+    if (time.daylight == 0):  # 1:dst;
+        time_zone = "%+03d:%02d" % (-(time.timezone / 3600), time.timezone % 3600 / 3600.0 * 60)
+    else:
+        time_zone = "%+03d:%02d" % (-(time.altzone / 3600), time.altzone % 3600 / 3600.0 * 60)
+    timestamp = (startTime).strftime('%Y-%m-%dT%H:%M:%S.%f') + time_zone
+    serverNum='localhost'
+    dport='9200'
+    #first step
+    diplist,es,allalerts=checkAlert('alert-*',gte1,lte,time_zone,serverNum,dport)
+    #second step
+    delta2=datetime.timedelta(days=1)
+    gte2 = (startTime - delta2).strftime('%Y-%m-%d %H:%M:%S')
+    lte = (startTime).strftime('%Y-%m-%d %H:%M:%S')
+    allwarn={}# {ip:[],ip:[],...}
+    try:
+        for dip in diplist:
+            allwarn[dip]=Second_check(es,gte2,lte,time_zone,dip)
+    except Exception,e:
+        mylog.error('second_check:{}'.format(e))
+    #insert warning alert
+    try:
+        searchAndInsert(allalerts,allwarn,es)
+    except Exception,e:
+        mylog.error('searchAndInsert:{}'.format(e))
