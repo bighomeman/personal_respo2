@@ -205,7 +205,8 @@ class ESclient(object):
             dip=temp["_source"]["dip"]
             allrecord[dip]=temp["_source"]
         return allrecord
-    def secondcheck(self,gte2,lte,time_zone,dip):
+    def secondcheck(self,gte2,lte,time_zone,dip,mylog):
+        mylog.info('start second check.')
         return Second_check(self.__es_client, gte2, lte, time_zone, dip)
 
 '''
@@ -245,9 +246,10 @@ def checkAlert(index,gte,lte,time_zone,serverNum,dport):
 searchAndInsert:1)modified the record (level:warning,add sip)
                 2)insert to es
 '''
-def searchAndInsert(alerts,ipdict,es):
+def searchAndInsert(alerts,ipdict,es,mylog):
     alert_dip=alerts.keys()
     warning_dip=ipdict.keys()
+    mylog.info('start second check insert.')
     for tmp in alert_dip:
         if(tmp in warning_dip):
             for tsip in ipdict[tmp]:
@@ -281,11 +283,11 @@ def main(startTime):
     allwarn={}# {ip:[],ip:[],...}
     try:
         for dip in diplist:
-            allwarn[dip]=es.secondcheck(gte2,lte,time_zone,dip)
+            allwarn[dip]=es.secondcheck(gte2,lte,time_zone,dip,mylog)
     except Exception,e:
         mylog.error('second_check:{}'.format(e))
     #insert warning alert
     try:
-        searchAndInsert(allalerts,allwarn,es)
+        searchAndInsert(allalerts,allwarn,es,mylog)
     except Exception,e:
         mylog.error('searchAndInsert:{}'.format(e))
