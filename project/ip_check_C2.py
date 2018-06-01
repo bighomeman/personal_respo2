@@ -97,7 +97,8 @@ def calc_MAD(datalist):
 # Second_check: 1）根据dip查找某段时间内所有与其通信的sip在每分钟flow计数；
 #             2）根据flow计数的序列判断是否有异常
 # return: 返回有问题的sip list
-def Second_check(es, gte, lte, time_zone, dip):
+def Second_check(es, gte, lte, time_zone, dip,mylog):
+    mylog.info('get flow.')
     res = get_date_flow(es=es, gte=gte, lte=lte, time_zone=time_zone, dip=dip)
     ret_siplist = []
     # each sip_item has only one sip but many flows in different time
@@ -116,6 +117,7 @@ def Second_check(es, gte, lte, time_zone, dip):
         print calc_MAD(flowlist)
         if (calc_MAD(date_dev) <= 60000) and (calc_MAD(flowlist) <= 1):
             ret_siplist.append(sip_item["key"])
+            mylog.info('append sip.')
     return ret_siplist
 
 class ESclient(object):
@@ -207,7 +209,7 @@ class ESclient(object):
         return allrecord
     def secondcheck(self,gte2,lte,time_zone,dip,mylog):
         mylog.info('start second check.')
-        return Second_check(self.__es_client, gte2, lte, time_zone, dip)
+        return Second_check(self.__es_client, gte2, lte, time_zone, dip,mylog)
 
 '''
 checkAlert: 检查alert中关于c&c的info告警，获取dip
