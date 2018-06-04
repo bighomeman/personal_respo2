@@ -243,7 +243,7 @@ def checkAndInsert(path,filelist,ip_es_list,index,aggs_name,timestamp,serverNum,
             fullmatch, segmentmatch, subnetlpm, subnetfull = treatip(dataset,ip_es_list)
             threatIP=insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetlpm,subnetfull,dataset)
             # merge
-            if(not threatIP):
+            if(threatIP):
                 all_threatIP=dict(all_threatIP,**threatIP)
     return all_threatIP
 
@@ -286,7 +286,8 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport,time_zone):
         try:
             #check each file and insert match results
             tmpThreatIP=checkAndInsert(path,filelist,ip_es_list,index,aggs_name,timestamp,serverNum,dport)
-            if(not tmpThreatIP):
+            # mylog.info('main_insert Threat_ip size:{}'.format(len(tmpThreatIP)))
+            if(tmpThreatIP):
                 allThreatIP=dict(allThreatIP,**tmpThreatIP)
         except Exception, e:
             mylog.error('check blacklist:{}'.format(e))
@@ -310,7 +311,7 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport,time_zone):
                         fullmatch, segmentmatch, subnetlpm, subnetfull = treatip(dataset, ip_es_list)
                         tmpIP=insert_result(index, aggs_name, timestamp, serverNum, dport, fullmatch, segmentmatch, subnetlpm,
                                   subnetfull, dataset)
-                        if(not tmpIP):
+                        if(tmpIP):
                             allThreatIP=dict(allThreatIP,**tmpIP)
                     except Exception,e:
                         mylog.error('check local blacklist:{}'.format(e))
