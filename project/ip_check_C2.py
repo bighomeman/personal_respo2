@@ -269,7 +269,7 @@ def searchAndInsert(alerts,ipdict,es,mylog):
     mylog.info('second check insert finished.')
 
 
-def main(startTime,all_IP):
+def main(startTime,all_IP,serverNum,dport):
     mylog=blacklist_tools.getlog()
     # startTime=datetime.datetime.now()
     delta1=datetime.timedelta(minutes=5)
@@ -281,8 +281,8 @@ def main(startTime,all_IP):
     else:
         time_zone = "%+03d:%02d" % (-(time.altzone / 3600), time.altzone % 3600 / 3600.0 * 60)
     timestamp = (startTime).strftime('%Y-%m-%dT%H:%M:%S.%f') + time_zone
-    serverNum='localhost'
-    dport='9200'
+    # serverNum='localhost'
+    # dport='9200'
     #first step,get the all_IP
     # mylog.info('start check alert info.')
     # diplist,es,allalerts=checkAlert('alert-*',gte1,lte,time_zone,serverNum,dport)
