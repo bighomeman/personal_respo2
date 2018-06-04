@@ -41,7 +41,7 @@ def timestamp_datetime(value):
 def main():
     dict = bitnodes()
     mylog=blacklist_tools.getlog()
-    print len(dict.keys())
+    mylog.info('bitnodes size:'.format(len(dict.keys())))
     store_json(dict, 'bitnodes')
     mylog.info("update bitnodes!")
 
