@@ -126,6 +126,7 @@ def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
             #IP second check for C&C
             flg_C2=parser_config.get_ip_secondcheck()
             if(flg_C2==1):
+                mylog.info('all_IP size:{}'.format(len(all_IP)))
                 ip_check_C2.main(startTime,all_IP)
             startTime = startTime + delta
             flgnum+=1

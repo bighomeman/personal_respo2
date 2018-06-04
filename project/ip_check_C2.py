@@ -98,7 +98,7 @@ def calc_MAD(datalist):
 #             2）根据flow计数的序列判断是否有异常
 # return: 返回有问题的sip list
 def Second_check(es, gte, lte, time_zone, dip,mylog):
-    mylog.info('get flow.')
+    mylog.info('get flow from ES.')
     res = get_date_flow(es=es, gte=gte, lte=lte, time_zone=time_zone, dip=dip)
     ret_siplist = []
     # each sip_item has only one sip but many flows in different time
@@ -110,14 +110,17 @@ def Second_check(es, gte, lte, time_zone, dip,mylog):
             flowlist.append(item["flow"]["value"])
         if len(datelist) < 2:
             continue
+        mylog.info('*-*-* len of datelist:{}'.format(len(datelist)))
         date_dev = [datelist[i + 1] - datelist[i] for i in range(len(datelist) - 1)]
         #		print date_dev
         #		print flowlist
-        print calc_MAD(date_dev)
-        print calc_MAD(flowlist)
+        mylog.info('*-*-* result of date_dev:{}'.format(calc_MAD(date_dev)))
+        mylog.info('*-*-* result of flowlist:{}'.format(calc_MAD(flowlist)))
+        # print calc_MAD(date_dev)
+        # print calc_MAD(flowlist)
         if (calc_MAD(date_dev) <= 60000) and (calc_MAD(flowlist) <= 1):
             ret_siplist.append(sip_item["key"])
-            mylog.info('append sip.')
+            mylog.info('*-*-* appending sip:{}.'.format(sip_item["key"]))
     return ret_siplist# sip
 
 class ESclient(object):
