@@ -24,7 +24,7 @@ def dshield_subnet():
             subnet=linelis[0].strip()+'/24'
             ip_dict[subnet] = {
                 'subtype':'dshield_attacking_subnet',
-                'desc_subtype':'dshield attacking subnet;source:http://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt',
+                'desc_subtype':'dshield attacking subnet;source:http://feeds.dshield.org/block.txt',
                 'level':'INFO',
                 'fp':'unknown',
                 'status':'unknown',

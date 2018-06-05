@@ -21,7 +21,7 @@ def ZeuS_ip():
         else:
             ip_dict[line] = {
                 'subtype':'ZeuS_trojan',
-                'desc_subtype':'ZeuS trojan ip;source:https://sslbl.abuse.ch/blacklist/sslipblacklist.csv',
+                'desc_subtype':'ZeuS trojan ip;source:https://zeustracker.abuse.ch/blocklist.php?download=badips',
                 'level':'INFO',
                 'fp':'unknown',
                 'status':'unknown',
