@@ -6,13 +6,18 @@ from store_json import store_json
 from project import blacklist_tools
 
 
-def bitnodes():
+def bitnodes(mylog):
     requests.adapters.DEFAULT_RETRIES = 5
     http = requests.get('https://bitnodes.earn.com/api/v1/snapshots/latest/',verify=False)
     neir = http.text
-    neir_json = json.loads(neir)
+    mylog.info('load json data from html.')
+    try:
+        neir_json = json.loads(neir)
+    except Exception,e:
+        mylog.error('load json ERROR')
     result = neir_json['nodes'].keys()
     ip_dict = {}
+    mylog.info('restructure data.')
     for ip_port in result:
         iplis = ip_port.split(':')# iplis=[ip,port]
         if(str.isdigit(str(iplis[1]))):
@@ -39,8 +44,9 @@ def timestamp_datetime(value):
     return dt
 
 def main():
-    dict = bitnodes()
-    mylog=blacklist_tools.getlog()
+    mylog = blacklist_tools.getlog()
+    mylog.info('download bitnodes...')
+    dict = bitnodes(mylog)
     mylog.info('bitnodes size:{}'.format(len(dict.keys())))
     store_json(dict, 'bitnodes')
     mylog.info("update bitnodes!")
