@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import requests,time
 from store_json import store_json
 from project import blacklist_tools
-
+# used to detect sip.
 def stopforumspam_toxic_ip_range():
     http = requests.get('http://www.stopforumspam.com/downloads/toxic_ip_range.txt',verify=False)
     neir = http.text

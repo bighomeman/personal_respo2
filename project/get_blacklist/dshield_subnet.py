@@ -7,6 +7,7 @@ from store_json import store_json
 from project import blacklist_tools
 
 # update per 15mins
+# used to detect sip
 def dshield_subnet():
     http = requests.get('http://feeds.dshield.org/block.txt',verify=False)
     neir = http.text
