@@ -10,15 +10,17 @@ def bitnodes(mylog):
     requests.adapters.DEFAULT_RETRIES = 5
     try:
         http = requests.get('https://bitnodes.earn.com/api/v1/snapshots/latest/',verify=False,timeout=120)
-    except Exception,e:
+        neir = http.text
+    except Exception, e:
         mylog.warning("download timeout!!!")
-    neir = http.text
+        neir='{}'
     mylog.info('loading json data from html.')
     try:
         neir_json = json.loads(neir)
-    except Exception,e:
+    except Exception, e:
         mylog.error('load json ERROR')
     result = neir_json['nodes'].keys()
+
     ip_dict = {}
     mylog.info('restructure data.')
     for ip_port in result:
