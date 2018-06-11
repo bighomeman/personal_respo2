@@ -20,7 +20,7 @@ def store_json(dict,name):
 			f.write(json.dumps(dict))
 	except IOError:
 		# print 'store_json Error'
-		mylog.error('change date time!download again!')
+		mylog.warning('change date time!download again!')
 
 if __name__ == '__main__':
 	dict={}

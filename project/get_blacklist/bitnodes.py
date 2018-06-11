@@ -8,9 +8,12 @@ from project import blacklist_tools
 
 def bitnodes(mylog):
     requests.adapters.DEFAULT_RETRIES = 5
-    http = requests.get('https://bitnodes.earn.com/api/v1/snapshots/latest/',verify=False)
+    try:
+        http = requests.get('https://bitnodes.earn.com/api/v1/snapshots/latest/',verify=False,timeout=30)
+    except Exception,e:
+        mylog.warning("download timeout!!!")
     neir = http.text
-    mylog.info('load json data from html.')
+    mylog.info('loading json data from html.')
     try:
         neir_json = json.loads(neir)
     except Exception,e:
