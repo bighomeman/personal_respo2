@@ -9,7 +9,7 @@ from project import blacklist_tools
 def bitnodes(mylog):
     requests.adapters.DEFAULT_RETRIES = 5
     try:
-        http = requests.get('https://bitnodes.earn.com/api/v1/snapshots/latest/',verify=False,timeout=30)
+        http = requests.get('https://bitnodes.earn.com/api/v1/snapshots/latest/',verify=False,timeout=120)
     except Exception,e:
         mylog.warning("download timeout!!!")
     neir = http.text
