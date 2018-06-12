@@ -7,11 +7,16 @@ from store_json import store_json
 from project import blacklist_tools
 
 # update per 15mins
-def ssl_abuse():
-    http = requests.get('https://sslbl.abuse.ch/blacklist/sslipblacklist.csv',verify=False)
-    neir = http.text
-    lines = neir.split('\n')
-    del lines[-1]
+def ssl_abuse(mylog):
+    requests.adapters.DEFAULT_RETRIES = 5
+    try:
+        http = requests.get('https://sslbl.abuse.ch/blacklist/sslipblacklist.csv', verify=False,timeout=120)
+        neir = http.text
+        lines = neir.split('\n')
+        del lines[-1]
+    except Exception, e:
+        mylog.warning("download timeout!!!")
+        lines=[]
     # print lines
     ip_dict = {}
     for line in lines:
@@ -34,8 +39,8 @@ def ssl_abuse():
     return ip_dict
 
 def main():
-    dict = ssl_abuse()
     mylog=blacklist_tools.getlog()
+    dict = ssl_abuse(mylog)
     print len(dict)
     store_json(dict,'ssl_abuse')
     mylog.info("update ssl_abuse!")

@@ -7,11 +7,16 @@ from store_json import store_json
 from project import blacklist_tools
 
 # update per 240mins
-def bogons_ip():
-    http = requests.get('http://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt')
-    neir = http.text
-    lines = neir.split('\n')
-    del lines[-1]
+def bogons_ip(mylog):
+    requests.adapters.DEFAULT_RETRIES = 5
+    try:
+        http = requests.get('http://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt',verify=False,timeout=120)
+        neir = http.text
+        lines = neir.split('\n')
+        del lines[-1]
+    except Exception, e:
+        mylog.warning("download timeout!!!")
+        lines=[]
     # print lines
     ip_dict = {}
     for line in lines:
@@ -33,8 +38,8 @@ def bogons_ip():
     return ip_dict
 
 def main():
-    dict = bogons_ip()
-    mylog=blacklist_tools.getlog()
+    mylog = blacklist_tools.getlog()
+    dict = bogons_ip(mylog)
     print len(dict)
     store_json(dict,'bogons')
     mylog.info("update bogons_ip!")

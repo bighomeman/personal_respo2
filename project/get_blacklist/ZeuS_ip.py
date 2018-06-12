@@ -7,11 +7,16 @@ from store_json import store_json
 from project import blacklist_tools
 
 # update per 30mins
-def ZeuS_ip():
-    http = requests.get('https://zeustracker.abuse.ch/blocklist.php?download=badips',verify=False)
-    neir = http.text
-    lines = neir.split('\n')
-    del lines[-1]
+def ZeuS_ip(mylog):
+    requests.adapters.DEFAULT_RETRIES = 5
+    try:
+        http = requests.get('https://zeustracker.abuse.ch/blocklist.php?download=badips', verify=False,timeout=120)
+        neir = http.text
+        lines = neir.split('\n')
+        del lines[-1]
+    except Exception, e:
+        mylog.warning("download timeout!!!")
+        lines=[]
     # print lines
     ip_dict = {}
     for line in lines:
@@ -33,8 +38,8 @@ def ZeuS_ip():
     return ip_dict
 
 def main():
-    dict = ZeuS_ip()
     mylog=blacklist_tools.getlog()
+    dict = ZeuS_ip(mylog)
     print len(dict)
     store_json(dict,'ZeuS_ip')
     mylog.info("update ZeuS_ip!")

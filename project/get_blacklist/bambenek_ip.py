@@ -8,11 +8,16 @@ from store_json import store_json
 from project import blacklist_tools
 
 
-def bambenek_ip():
-    http = requests.get('http://osint.bambenekconsulting.com/feeds/c2-ipmasterlist.txt',verify=False)
-    neir = http.text
-    lines = neir.split('\n')
-    del lines[-1]
+def bambenek_ip(mylog):
+    requests.adapters.DEFAULT_RETRIES = 5
+    try:
+        http = requests.get('http://osint.bambenekconsulting.com/feeds/c2-ipmasterlist.txt', verify=False,timeout=120)
+        neir = http.text
+        lines = neir.split('\n')
+        del lines[-1]
+    except Exception, e:
+        mylog.warning("download timeout!!!")
+        lines=[]
     # print lines
     ip_dict = {}
     for line in lines:
@@ -36,8 +41,8 @@ def bambenek_ip():
     return ip_dict
 
 def main():
-    dict = bambenek_ip()
-    mylog=blacklist_tools.getlog()
+    mylog = blacklist_tools.getlog()
+    dict = bambenek_ip(mylog)
     print len(dict)
     store_json(dict,'bambenek_ip')
     mylog.info("update bambenek_ip!")

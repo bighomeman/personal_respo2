@@ -5,11 +5,17 @@ import requests,time
 from store_json import store_json
 from project import blacklist_tools
 
-def firehol_level1():
-    http = requests.get('http://iplists.firehol.org/files/firehol_level1.netset')
-    neir = http.text
-    lines = neir.split('\n')
-    del lines[-1]
+def firehol_level1(mylog):
+    requests.adapters.DEFAULT_RETRIES = 5
+    try:
+        http = requests.get('http://iplists.firehol.org/files/firehol_level1.netset',verify=False,timeout=120)
+        neir = http.text
+        lines = neir.split('\n')
+        del lines[-1]
+    except Exception, e:
+        mylog.warning("download timeout!!!")
+        lines=[]
+    # print lines
     ip_dict = {}
     for line in lines:
         # print line
@@ -26,8 +32,8 @@ def firehol_level1():
     return ip_dict
 
 def main():
-    dict = firehol_level1()
     mylog=blacklist_tools.getlog()
+    dict = firehol_level1(mylog)
     print len(dict.keys())
     store_json(dict, 'firehol_level1')
     mylog.info("update firehol!")

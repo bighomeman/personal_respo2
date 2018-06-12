@@ -8,11 +8,16 @@ from project import blacklist_tools
 
 # update per 15mins
 # used to detect sip
-def dshield_subnet():
-    http = requests.get('http://feeds.dshield.org/block.txt',verify=False)
-    neir = http.text
-    lines = neir.split('\n')
-    del lines[-1]
+def dshield_subnet(mylog):
+    requests.adapters.DEFAULT_RETRIES = 5
+    try:
+        http = requests.get('http://feeds.dshield.org/block.txt',verify=False,timeout=120)
+        neir = http.text
+        lines = neir.split('\n')
+        del lines[-1]
+    except Exception, e:
+        mylog.warning("download timeout!!!")
+        lines=[]
     # print lines
     ip_dict = {}
     for line in lines:
@@ -37,8 +42,8 @@ def dshield_subnet():
     return ip_dict
 
 def main():
-    dict = dshield_subnet()
     mylog=blacklist_tools.getlog()
+    dict = dshield_subnet(mylog)
     print len(dict)
     store_json(dict,'dshield_subnet')
     mylog.info("update dshield !")

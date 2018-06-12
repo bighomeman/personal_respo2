@@ -19,7 +19,10 @@ def bitnodes(mylog):
         neir_json = json.loads(neir)
     except Exception, e:
         mylog.error('load json ERROR')
-    result = neir_json['nodes'].keys()
+    if neir_json:
+        result = neir_json['nodes'].keys()
+    else:
+        result=[]
 
     ip_dict = {}
     mylog.info('restructure data.')
