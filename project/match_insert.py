@@ -24,7 +24,7 @@ class ESclient(object):
                 "must": [
                     {
                         "query_string": {
-                            "query": "NOT dip:[192.168.0.0 TO 192.168.255.255]",
+                            "query": "NOT dip:[192.168.0.0 TO 192.168.255.255] AND NOT dip:[172.16.0.0 TO 172.31.255.255] AND NOT dip[10.0.0.0 TO 10.255.255.255] AND NOT dport:445",
                             "analyze_wildcard": True
                         }
                     },
