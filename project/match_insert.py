@@ -150,7 +150,7 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             doc = {}
             doc['level'] = msg[fullmatch[i]]['level']
             doc['type']='mal_ip'
-            doc['desc_type']='[MAL_IP] Request of suspect IP detection.'
+            doc['desc_type']='[mal_ip] Request of suspect IP detection.'
             doc['desc_subtype'] = msg[fullmatch[i]]['desc_subtype']
             doc['subtype']=msg[fullmatch[i]]['subtype']
             doc['match_type'] = "full_match"
@@ -172,7 +172,7 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             doc = {}
             doc['level'] = msg[ipseg]['level']
             doc['type'] = 'mal_ip'
-            doc['desc_type'] = '[MAL_IP] Request of suspect IP detection.'
+            doc['desc_type'] = '[mal_ip] Request of suspect IP detection.'
             doc['desc_subtype'] = msg[ipseg]['desc_subtype']
             doc['subtype'] = msg[ipseg]['subtype']
             doc['match_type'] = "segment_match"
@@ -195,7 +195,7 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             doc = {}
             doc['level'] = msg[key1]['level']
             doc['type'] = 'mal_ip'
-            doc['desc_type'] = '[MAL_IP] Request of suspect IP detection.'
+            doc['desc_type'] = '[mal_ip] Request of suspect IP detection.'
             tmptype=msg[key1]['desc_subtype'].split(';')
             doc['desc_subtype'] = tmptype[0].split(':')[0]+';'+tmptype[1]
             doc['subtype'] = msg[key1]['subtype']
@@ -218,7 +218,7 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             doc = {}
             doc['level'] = msg[ipseg]['level']
             doc['type'] = 'mal_ip'
-            doc['desc_type'] = '[MAL_IP] Request of suspect IP detection.'
+            doc['desc_type'] = '[mal_ip] Request of suspect IP detection.'
             doc['desc_subtype'] = msg[ipseg]['desc_subtype']
             doc['subtype'] = msg[ipseg]['subtype']
             doc['match_type'] = 'subnet_fullmatch'
