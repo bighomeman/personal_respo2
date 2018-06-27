@@ -25,9 +25,9 @@ def bogons_ip(mylog):
             continue
         else:
             ip_dict[line] = {
-                'subtype':'bogons_subnet',
+                'subtype':'bogons',
                 'desc_subtype':'bogons subnet;source:http://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt',
-                'level':'INFO',
+                'level':'info',
                 'fp':'unknown',
                 'status':'unknown',
                 'dport':-1,

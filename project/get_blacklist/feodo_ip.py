@@ -25,9 +25,9 @@ def feodo_ip(mylog):
             continue
         else:
             ip_dict[line] = {
-                'subtype':'Feodo_C&C',
+                'subtype':'c&c',
                 'desc_subtype':'Feodo C&C ip;source:https://feodotracker.abuse.ch/blocklist/?download=ipblocklist',
-                'level':'INFO',
+                'level':'info',
                 'fp':'unknown',
                 'status':'unknown',
                 'dport':-1,

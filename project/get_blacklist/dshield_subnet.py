@@ -29,9 +29,9 @@ def dshield_subnet(mylog):
             linelis=line.split('\t')
             subnet=linelis[0].strip()+'/24'
             ip_dict[subnet] = {
-                'subtype':'dshield_attacking_subnet',
+                'subtype':'dshield',
                 'desc_subtype':'dshield attacking subnet;source:http://feeds.dshield.org/block.txt',
-                'level':'INFO',
+                'level':'info',
                 'fp':'unknown',
                 'status':'unknown',
                 'dport':-1,

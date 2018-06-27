@@ -25,10 +25,11 @@ def ssl_abuse(mylog):
             continue
         else:
             lis=line.split(',')# line = 'DstIP,DstPort,Reason' -> lis =[DstIP,DstPort,Reason]
+            tmpstr=lis[2].strip()
             ip_dict[lis[0]] = {
-                'subtype':lis[2].strip().replace(' ','_'),
+                'subtype':tmpstr.split(' ')[1].lower(),
                 'desc_subtype':'{} ip;source:https://sslbl.abuse.ch/blacklist/sslipblacklist.csv'.format(lis[2]),
-                'level':'INFO',
+                'level':'info',
                 'fp':'unknown',
                 'status':'unknown',
                 'dport':int(lis[1]),

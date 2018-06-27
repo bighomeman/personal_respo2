@@ -23,7 +23,7 @@ def stopforumspam_toxic_ip_range(mylog):
         ip_dict[line] = {
             'subtype':'spam',
             'desc_subtype':'spam ip;source:http://www.stopforumspam.com/downloads/toxic_ip_range.txt',
-            'level':'INFO',
+            'level':'info',
             'fp':'unknown',
             'status':'unknown',
             'dport': -1,

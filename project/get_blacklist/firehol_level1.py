@@ -22,7 +22,7 @@ def firehol_level1(mylog):
         ip_dict[line] = {
             'subtype':'suspect',
             'desc_subtype':'suspect ip;source:iplists.firehol.org/files/firehol_level1.netset',
-            'level':'INFO',
+            'level':'info',
             'fp':'unknown',
             'status':'unknown',
             'dport': -1,

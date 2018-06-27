@@ -25,9 +25,9 @@ def MiningServerIPList(mylog):
     ip_dict = {}
     for ip in result:
         ip_dict[ip] ={
-            'subtype':'mining_pool',
+            'subtype':'mining',
             'desc_subtype':'mining pool ip;source:github.com/ZeroDot1/CoinBlockerLists/blob/master/MiningServerIPList',
-            'level':'INFO',
+            'level':'info',
             'fp':'unknown',
             'status':'unknown',
             'dport': -1,

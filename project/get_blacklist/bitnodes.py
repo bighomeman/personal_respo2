@@ -30,9 +30,9 @@ def bitnodes(mylog):
         iplis = ip_port.split(':')# iplis=[ip,port]
         if(str.isdigit(str(iplis[1]))):
             ip_dict[iplis[0]] ={
-                'subtype':'mining_pool',
+                'subtype':'mining',
                 'desc_subtype':'mining pool ip;source:bitnodes.earn.com/api/v1/snapshots/latest/',
-                'level':'INFO',
+                'level':'info',
                 'fp':'unknown',
                 'status':'unknown',
                 'dport': int(iplis[1]),

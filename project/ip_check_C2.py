@@ -220,7 +220,7 @@ checkAlert: 检查alert中关于c&c的info告警，获取dip
 '''
 def checkAlert(index,gte,lte,time_zone,serverNum,dport):
     querystr={
-        "query":"type:MAL_IP",
+        "query":"type:mal_ip",
         "analyze_wildcard": True
     }
     filetype='dip'
@@ -262,7 +262,7 @@ def searchAndInsert(alerts,ipdict,es,mylog):
         if(tmp in alert_dip):# make sure that dip in alerts
             for tsip in ipdict[tmp]:
                 doc=alerts[tmp]
-                doc['level']="WARNING"
+                doc['level']="warning"
                 doc['sip']=tsip
                 es.es_index(doc)
                 mylog.info('insert WARNING!!!')

@@ -149,7 +149,7 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
         for i in range(len(fullmatch)):
             doc = {}
             doc['level'] = msg[fullmatch[i]]['level']
-            doc['type']='MAL_IP'
+            doc['type']='mal_ip'
             doc['desc_type']='[MAL_IP] Request of suspect IP detection.'
             doc['desc_subtype'] = msg[fullmatch[i]]['desc_subtype']
             doc['subtype']=msg[fullmatch[i]]['subtype']
@@ -171,7 +171,7 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             # print ipseg
             doc = {}
             doc['level'] = msg[ipseg]['level']
-            doc['type'] = 'MAL_IP'
+            doc['type'] = 'mal_ip'
             doc['desc_type'] = '[MAL_IP] Request of suspect IP detection.'
             doc['desc_subtype'] = msg[ipseg]['desc_subtype']
             doc['subtype'] = msg[ipseg]['subtype']
@@ -194,7 +194,7 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             key1=msg.keys()[0]
             doc = {}
             doc['level'] = msg[key1]['level']
-            doc['type'] = 'MAL_IP'
+            doc['type'] = 'mal_ip'
             doc['desc_type'] = '[MAL_IP] Request of suspect IP detection.'
             tmptype=msg[key1]['desc_subtype'].split(';')
             doc['desc_subtype'] = tmptype[0].split(':')[0]+';'+tmptype[1]
@@ -217,7 +217,7 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
             # print ipseg
             doc = {}
             doc['level'] = msg[ipseg]['level']
-            doc['type'] = 'MAL_IP'
+            doc['type'] = 'mal_ip'
             doc['desc_type'] = '[MAL_IP] Request of suspect IP detection.'
             doc['desc_subtype'] = msg[ipseg]['desc_subtype']
             doc['subtype'] = msg[ipseg]['subtype']
