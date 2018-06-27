@@ -26,7 +26,7 @@ def bambenek_ip(mylog):
             continue
         else:
             linelist=line.split(',')# line = ' ip,type,date,source'
-            subtype=linelist[1].split('by')[1].strip().replace(' ','_')
+            subtype=linelist[1].split('by')[-1].strip().replace(' ','_')
             subtype2=subtype.split('_')[1].lower()
             ip_dict[linelist[0]] = {
                 'subtype':subtype2,
