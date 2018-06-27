@@ -281,7 +281,7 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport,time_zone):
     es = ESclient(server =serverNum,port=dport)
     # mylog.info('connected with es')
     ip_es_list = es.get_es_ip(index,gte,lte,aggs_name,time_zone)
-    # mylog.info('get es data,data size:%d'%len(ip_es_list))
+    mylog.info('get es data,data size:%d'%len(ip_es_list))
     if(filelist):
         try:
             #check each file and insert match results
