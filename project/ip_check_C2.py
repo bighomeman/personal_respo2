@@ -262,7 +262,7 @@ def searchAndInsert(alerts,ipdict,es,mylog):
         if(tmp in alert_dip):# make sure that dip in alerts
             for tsip in ipdict[tmp]:
                 doc=alerts[tmp]
-                doc['level']="warning"
+                doc['level']="warn"
                 doc['sip']=tsip
                 es.es_index(doc)
                 mylog.info('insert WARNING!!!')
