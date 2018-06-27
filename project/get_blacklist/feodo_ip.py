@@ -42,7 +42,7 @@ def main():
     dict = feodo_ip(mylog)
     print len(dict)
     store_json(dict,'feodo_ip')
-    mylog.info("update ssl_abuse!")
+    mylog.info("update feodo_ip!")
     # print 'update successfully'
 
 if __name__=="__main__":
