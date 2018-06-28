@@ -6,7 +6,7 @@ import requests , re, json,time
 from store_json import store_json
 from project import blacklist_tools
 
-
+# update per 12h, 144
 def dropList(mylog):
     requests.adapters.DEFAULT_RETRIES = 5
     try:
