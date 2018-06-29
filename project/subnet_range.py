@@ -52,6 +52,7 @@ def subnet_lpm(subnet,es_ip):
     fpath = parser_config.get_store_path()[1]
     sn_lte16 = {}
     lpmdict={}
+    sn_gte24={}
     ip_subnet=subnet.keys()
     for sn in ip_subnet:
         subnet_split = sn.split('/')
@@ -73,50 +74,55 @@ def subnet_lpm(subnet,es_ip):
             newip1.append('*')
             ipstr1 = '.'.join(newip1)
             lpm.insert_rule(ipstr1)
-        elif(netMask==23):
+        elif(netMask>=21 and netMask<=24):
             lpmdict[sn] = subnet[sn]
-            newip1=[]
-            ip_num[2]=ip_num[2]|1
-            newip1.append(str(ip_num[0]))
-            newip1.append(str(ip_num[1]))
-            newip1.append(str(ip_num[2]))
-            newip1.append('*')
-            ipstr1='.'.join(newip1)
-            lpm.insert_rule(ipstr1)
-            newip2=[]
-            ip_num[2]=ip_num[2]&254
-            newip2.append(str(ip_num[0]))
-            newip2.append(str(ip_num[1]))
-            newip2.append(str(ip_num[2]))
-            newip2.append('*')
-            ipstr2='.'.join(newip2)
-            lpm.insert_rule(ipstr2)
-        elif(netMask==25 or netMask==24):
-            #/25当/24处理
-            lpmdict[sn] = subnet[sn]
-            newip1 = []
-            newip1.append(str(ip_num[0]))
-            newip1.append(str(ip_num[1]))
-            newip1.append(str(ip_num[2]))
-            newip1.append('*')
-            ipstr1 = '.'.join(newip1)
-            lpm.insert_rule(ipstr1)
+            idx = pow(2, 24 - netMask) - 1
+            # print idx
+            ip_base = ip_num[2] & (255 - idx)
+            i = 0
+            while (i <= idx):
+                newip1 = []
+                ipstr1 = ''
+                ip_num[2] = ip_base + i
+                newip1.append(str(ip_num[0]))
+                newip1.append(str(ip_num[1]))
+                newip1.append(str(ip_num[2]))
+                newip1.append('*')
+                ipstr1 = '.'.join(newip1)
+                # print ipstr1
+                lpm.insert_rule(ipstr1)
+                i = i + 1
+        # elif(netMask==24):
+        #     #/25当/24处理
+        #     lpmdict[sn] = subnet[sn]
+        #     newip1 = []
+        #     newip1.append(str(ip_num[0]))
+        #     newip1.append(str(ip_num[1]))
+        #     newip1.append(str(ip_num[2]))
+        #     newip1.append('*')
+        #     ipstr1 = '.'.join(newip1)
+        #     lpm.insert_rule(ipstr1)
+        elif(netMask>24):# range match
+            sn_gte24[sn]=subnet[sn]
         else:
-            #netMask>16 and not in [16,23,24,25],save them
+            #netMask>16 and netMask<21,save them
             sndict[sn]=subnet[sn]
-
     mylog.info('lpm data size: %d'%len(lpmdict))
+    mylog.info('remaining subnet size:%d'%len(sndict))
+    mylog.info('lte16 size:%d'%len(sn_lte16))
+    mylog.info('gte24 size:%d' % len(sn_gte24))
     #save
-    snpath=getsavepath(fpath,'remain_subnet')
+    snpath=getsavepath(fpath,'remaining_subnet')
     ltepath=getsavepath(fpath,'lte16_subnet')
     lpmpath=getsavepath(fpath,'lpm_subnet_data')
+    gtepath=getsavepath(fpath,'gte24_subnet')
     if(sndict):
         if(os.path.exists(snpath)):
             newsndict=blacklist_tools.load_dict(snpath)
             newsndict1=dict(newsndict,**sndict)#merge
-            saveToJSON(newsndict1, fpath, "remain_subnet")
+            saveToJSON(newsndict1, fpath, "remaining_subnet")
         else:
-            saveToJSON(sndict, fpath,"remain_subnet")
+            saveToJSON(sndict, fpath,"remaining_subnet")
     if (sn_lte16):
         if(os.path.exists(ltepath)):
             newlte=blacklist_tools.load_dict(ltepath)
@@ -131,35 +137,51 @@ def subnet_lpm(subnet,es_ip):
             saveToJSON(newlpmdict1, fpath, 'lpm_subnet_data')
         else:
             saveToJSON(lpmdict,fpath,'lpm_subnet_data')
+    if(sn_gte24):
+        if(os.path.exists(gtepath)):
+            newlpmdict=blacklist_tools.load_dict(gtepath)
+            newlpmdict1=dict(newlpmdict,**sn_gte24)#merge
+            saveToJSON(newlpmdict1, fpath, 'gte24_subnet')
+        else:
+            saveToJSON(sn_gte24,fpath,'gte24_subnet')
     #match
     subnet_result=[]
     for ips in es_ip:
         ip_es_num = socket.ntohl(struct.unpack("I", socket.inet_aton(str(ips)))[0])
         if(lpm.search_ip(ip_es_num)):
             subnet_result.append({ips:'subnet_lpm_match'})
-    return subnet_result, sndict, sn_lte16
+    return subnet_result, sndict, sn_lte16,sn_gte24
 
 # zhou
-def subnet_range_match(sndict,sn_lte16,es_ip):
-    sndict_list = []
+# focus on gte24 data
+# Firstly, change gte24 to range type
+# Secondly, match by range method
+def subnet_range_match(sn_gte24,es_ip):
+    sn_gte24_list = []
+    #firstly,change
+    allrange=subnetTOrange(sn_gte24)
+    #secondly, match
+    mylog=blacklist_tools.getlog()
+    mylog.info('subnet_gte_24 match,gte24 size:{}'.format(len(sn_gte24)))
     for ips in es_ip:
         ip_es_num = socket.ntohl(struct.unpack("I",socket.inet_aton(str(ips)))[0])
-        for key in sndict:
-            subnet_num = subnet_range(key)
+        for key in allrange.keys():
+            subnet_num = allrange[key]
             # print subnet_num[0],subnet_num[1]
             subnet_num_min = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[0])))[0])
             subnet_num_max = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[1])))[0])
             if subnet_num_min <= ip_es_num <= subnet_num_max:
-                sndict_list.append({ips:key})
-        for key in sn_lte16:#key is ip
-            subnet_num = subnet_range(key)
-            # print subnet_num[0],subnet_num[1]
-            subnet_num_min = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[0])))[0])
-            subnet_num_max = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[1])))[0])
-            if subnet_num_min <= ip_es_num <= subnet_num_max:
-                sndict_list.append({ips:key})
-    return sndict_list
+                sn_gte24_list.append({ips:key})
+        # for key in sn_lte16:#key is ip
+        #     subnet_num = subnet_range(key)
+        #     # print subnet_num[0],subnet_num[1]
+        #     subnet_num_min = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[0])))[0])
+        #     subnet_num_max = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[1])))[0])
+        #     if subnet_num_min <= ip_es_num <= subnet_num_max:
+        #         sndict_list.append({ips:key})
+    return sn_gte24_list
 
+# change subnet to range
 def subnet_range(subnet):
     subnet_split = subnet.split('/')
     ip_num = ip_split_num(subnet_split[0])
@@ -213,3 +235,9 @@ def subnet_range(subnet):
         ip_range.append(end_addr)
 
     return ip_range
+
+def subnetTOrange(sn24):
+    allRange={}
+    for subnets in sn24:# {key:[start,end]}
+        allRange[subnets]=subnet_range(subnets)
+    return allRange

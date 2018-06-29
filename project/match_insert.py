@@ -3,7 +3,7 @@
 
 from elasticsearch import Elasticsearch
 import json
-import datetime,sys
+import datetime,sys,time
 from blacklist_tools import load_dict,load_whitelist
 import blacklist_tools
 import treat_ip
@@ -110,14 +110,17 @@ def treatip(dataset,es_ip):
     if(1==flg_lpm):
         # subnet match by lpm,subnet_lpm is match results;sndict and sn_lte16 is original subnet data
         mylog.info('start lpm match')
-        subnet_lpm,sndict,sn_lte16=subnet_range.subnet_lpm(subnet,es_ip)
+        atime=time.time()
+        subnet_lpm,sndict,sn_lte16,sn_gte24=subnet_range.subnet_lpm(subnet,es_ip)
+        ftime=time.time()-atime
+        mylog.info('times:{}'.format(ftime))
         mylog.info('finish lpm match')
     if(1==flg_full):
         #subnet match by zhou, parameters are snlist and es_ip
-        mylog.info('sndict size: %d'%len(sndict))
-        mylog.info('sn_lte16 size: %d' % len(sn_lte16))
+        # mylog.info('sndict size: %d'%len(sndict))
+        # mylog.info('sn_lte16 size: %d' % len(sn_lte16))
         mylog.info('start range subnet match')
-        subnet_full=subnet_range.subnet_range_match(sndict,sn_lte16,es_ip)
+        subnet_full=subnet_range.subnet_range_match(sn_gte24,es_ip)
         mylog.info('finish range subnet match')
     #whitelist
     wlflg, whitepath = parser_config.get_self_filelist('whitelist')
@@ -233,8 +236,10 @@ def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmat
 
 def checkAndInsert(path,filelist,ip_es_list,index,aggs_name,timestamp,serverNum,dport):
     # check each file
+    mylog=blacklist_tools.getlog()
     all_threatIP={}
     for fname in filelist:
+        mylog.info('-*-*-*-*-file:{}-*-*-*-*-'.format(fname))
         fpath = path + fname
         dataset = load_dict(fpath)
         if (dataset):
