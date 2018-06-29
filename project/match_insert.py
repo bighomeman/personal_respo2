@@ -286,7 +286,7 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport,time_zone):
     es = ESclient(server =serverNum,port=dport)
     # mylog.info('connected with es')
     ip_es_list = es.get_es_ip(index,gte,lte,aggs_name,time_zone)
-    mylog.info('get es data,data size:%d'%len(ip_es_list))
+    mylog.info('ES data size:%d '%len(ip_es_list))
     if(filelist):
         try:
             #check each file and insert match results
@@ -307,7 +307,7 @@ def main(tday,index, gte, lte, aggs_name, timestamp,serverNum,dport,time_zone):
             # check each file
             for fname in filelist:
                 fpath = blackpath + fname
-                mylog.info('start check local file:{}'.format(fname))
+                mylog.info(' -*-*-*-*- local file:{} -*-*-*-*-'.format(fname))
                 dataset = blacklist_tools.load_blacklist(fpath)
                 if (dataset):
                     # msg = dataset[dataset.keys()[0]]

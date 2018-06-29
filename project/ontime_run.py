@@ -70,8 +70,8 @@ def checkES(startTime,indx,aggs_name,serverNum,dport,tday):
     # new check function
     mylog=blacklist_tools.getlog()
     try:
-        print("Starting check command."), time.ctime()
-        mylog.info("Starting check command.Time is:{}".format((startTime).strftime('%Y-%m-%d %H:%M:%S')))
+        # print("Starting check command."), time.ctime()
+        mylog.info("[Starting check command.Time is:{}]".format((startTime).strftime('%Y-%m-%d %H:%M:%S')))
         # execute the command
         gte = (startTime - delta).strftime('%Y-%m-%d %H:%M:%S')
         lte = (startTime).strftime('%Y-%m-%d %H:%M:%S')
@@ -83,8 +83,8 @@ def checkES(startTime,indx,aggs_name,serverNum,dport,tday):
         timestamp = (startTime).strftime('%Y-%m-%dT%H:%M:%S.%f') + time_zone
         all_ip=match_insert.main(tday,indx,gte,lte,aggs_name,timestamp,serverNum,dport,time_zone)
         # print("check finish."), time.ctime()
-        mylog.info("check finish.{}".format("="*20))
-        print"="*40
+        mylog.info("{0}check finish.{1}".format("="*30,"="*30))
+        # print"="*40
         return all_ip
 
     except Exception, e:
@@ -113,7 +113,7 @@ def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
             os.mkdir(dirpath)
         while datetime.datetime.now() < startTime:
             #print('time sleep...')
-            mylog.info("time sleep...")
+            mylog.info("Time sleeping ...")
             time.sleep((startTime-datetime.datetime.now()).total_seconds())
         try:
             # st=time.clock()

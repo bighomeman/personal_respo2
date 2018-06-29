@@ -162,7 +162,7 @@ def subnet_range_match(sn_gte24,es_ip):
     allrange=subnetTOrange(sn_gte24)
     #secondly, match
     mylog=blacklist_tools.getlog()
-    mylog.info('subnet_gte_24 match,gte24 size:{}'.format(len(sn_gte24)))
+    mylog.info('gte24 size:{}'.format(len(sn_gte24)))
     for ips in es_ip:
         ip_es_num = socket.ntohl(struct.unpack("I",socket.inet_aton(str(ips)))[0])
         for key in allrange.keys():

@@ -110,17 +110,17 @@ def Second_check(es, gte, lte, time_zone, dip,mylog):
             flowlist.append(item["flow"]["value"])
         if len(datelist) < 2:
             continue
-        mylog.info('*-*-* len of datelist:{}'.format(len(datelist)))
+        mylog.info('*_*_* len of datelist:{} *_*_*'.format(len(datelist)))
         date_dev = [datelist[i + 1] - datelist[i] for i in range(len(datelist) - 1)]
         #		print date_dev
         #		print flowlist
-        mylog.info('*-*-* result of date_dev:{}'.format(calc_MAD(date_dev)))
-        mylog.info('*-*-* result of flowlist:{}'.format(calc_MAD(flowlist)))
+        mylog.info('*_*_* result of date_dev:{} *_*_*'.format(calc_MAD(date_dev)))
+        mylog.info('*_*_* result of flowlist:{} *_*_*'.format(calc_MAD(flowlist)))
         # print calc_MAD(date_dev)
         # print calc_MAD(flowlist)
         if (calc_MAD(date_dev) <= 60000) and (calc_MAD(flowlist) <= 1):
             ret_siplist.append(sip_item["key"])
-            mylog.info('*-*-* appending sip:{}.'.format(sip_item["key"]))
+            mylog.info('*_*_* appending sip:{}. *_*_*'.format(sip_item["key"]))
     return ret_siplist# sip
 
 class ESclient(object):
