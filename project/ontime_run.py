@@ -66,15 +66,15 @@ day = datetime.timedelta(days=1)
 #             print e
 
 
-def checkES(startTime,indx,aggs_name,serverNum,dport,tday):
+def checkES(startTime,indx,aggs_name,serverNum,dport,tday,offset):
     # new check function
     mylog=blacklist_tools.getlog()
     try:
         # print("Starting check command."), time.ctime()
         mylog.info("[Starting check command.Time is:{}]".format((startTime).strftime('%Y-%m-%d %H:%M:%S')))
         # execute the command
-        gte = (startTime - delta).strftime('%Y-%m-%d %H:%M:%S')
-        lte = (startTime).strftime('%Y-%m-%d %H:%M:%S')
+        gte = (startTime - delta-offset).strftime('%Y-%m-%d %H:%M:%S')
+        lte = (startTime-offset).strftime('%Y-%m-%d %H:%M:%S')
         time_zone=''
         if(time.daylight==0):# 1:dst;
             time_zone="%+03d:%02d"%(-(time.timezone/3600),time.timezone%3600/3600.0*60)
@@ -94,7 +94,7 @@ def checkES(startTime,indx,aggs_name,serverNum,dport,tday):
 
 
 
-def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
+def new_run(entertime,delta,serverNum,dport,offset,indx='tcp-*',aggs_name='dip',):
     # new running procedure
     updatetime=datetime.datetime.now()
     startTime = entertime
@@ -105,6 +105,7 @@ def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
     tday=datetime.datetime.now().date()
     # runtime=0 # elapsed time of whole process,included check and merge
     mylog=blacklist_tools.getlog()
+    updateFlg=parser_config.update_flg() #
     while True:
         if(tday!=datetime.datetime.now().date()):
             flgnum=0 # reset flgnum per day
@@ -118,11 +119,12 @@ def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
         try:
             # st=time.clock()
             #update source dataset
-            if(datetime.datetime.now()>updatetime):
-                update_blacklist.main(tday,flgnum)
-                updatetime=updatetime+delta
+            if(updateFlg==1):
+                if(datetime.datetime.now()>updatetime):
+                    update_blacklist.main(tday,flgnum)
+                    updatetime=updatetime+delta
             # check interval time is 5mins
-            all_IP=checkES(startTime,indx,aggs_name,serverNum,dport,tday)
+            all_IP=checkES(startTime,indx,aggs_name,serverNum,dport,tday,offset)
             #IP second check for C&C
             flg_C2=parser_config.get_ip_secondcheck()
             if(flg_C2==1):
@@ -138,11 +140,14 @@ def new_run(entertime,delta,serverNum,dport,indx='tcp-*',aggs_name='dip',):
 
 if __name__=="__main__":
     #delta = 5mins
-    delta,discard=parser_config.getCheckDeltatime()
+    delta,discard,offset=parser_config.getCheckDeltatime()
     # entertime =
     entertime = time.strftime("%Y-%m-%d %H:%M:%S")
     startTime = datetime.datetime.strptime(discard, '%Y-%m-%d %H:%M:%S')
     serverNum,dport,indx,aggs_name=parser_config.get_ES_info()
     #serverNum='172.23.2.96',dport = "9200";indx=tcp-*; aggs_name=dip
-    new_run(startTime,delta,serverNum,dport,indx,aggs_name)
+    #set global dic for storm suppression
+    blacklist_tools.global_init()
+    blacklist_tools.set_global_value('warn',[])
+    new_run(startTime,delta,serverNum,dport,offset,indx,aggs_name)
     # store_run()

@@ -5,7 +5,7 @@
 from elasticsearch import Elasticsearch
 import time
 import datetime
-import blacklist_tools
+import blacklist_tools,parser_config
 
 # !/usr/bin/python
 # -*- coding: utf-8 -*-
@@ -260,7 +260,7 @@ def searchAndInsert(alerts,ipdict,es,mylog):
     mylog.info('start second check insert.')
     for tmp in warning_dip:
         if(tmp in alert_dip):# make sure that dip in alerts
-            for tsip in ipdict[tmp]:
+            for tsip in ipdict[tmp]:# insert sip/dip to es
                 doc=alerts[tmp]
                 doc['level']="warn"
                 doc['sip']=tsip
@@ -268,8 +268,32 @@ def searchAndInsert(alerts,ipdict,es,mylog):
                 mylog.info('insert WARNING!!!')
     mylog.info('second check insert finished.')
 
+def list_filter(wlis,allwarn):
+    # return subwarn which (sip,dip) not in wlis
+    # first step: get (sip,dip) list
+    warnlis=[]
+    for it in wlis:
+        for ii in it.keys():# ii is dip
+            for ss in it[ii]: #ss is sip
+                warnlis.append((ss,ii))
+    alllis=[]
+    for dd in allwarn.keys():#dd is dip
+        for sss in allwarn[dd]:# sss is sip
+            alllis.append((sss,dd))
+    # second step: get new(sip,dip) list
+    alllis=list(set(alllis)-set(warnlis))
+    # finally, change type as dic ( {'dip:[sips],...})
+    subwarn={}
+    for jj in alllis:# jj is (sip,dip)
+        if(jj[1] in subwarn.keys()):
+            subwarn[jj[1]].append(jj[0])
+        else:
+            subwarn[jj[1]]=[]
+            subwarn[jj[1]].append(jj[0])
+    return subwarn
 
 def main(startTime,all_IP,serverNum,dport):
+    # all_IP is a dips inserted as an information alert into es
     mylog=blacklist_tools.getlog()
     # startTime=datetime.datetime.now()
     delta1=datetime.timedelta(minutes=5)
@@ -292,13 +316,34 @@ def main(startTime,all_IP,serverNum,dport):
     gte2 = (startTime - delta2).strftime('%Y-%m-%d %H:%M:%S')
     lte = (startTime).strftime('%Y-%m-%d %H:%M:%S')
     allwarn={}# {dip:[sip,sip,sip...],ip:[],...},
+
     try:
-        for dip in all_IP.keys():
+        for dip in all_IP.keys():# {'dip':[siplist],...}
             allwarn[dip]=es.secondcheck(gte2,lte,time_zone,dip,mylog)
     except Exception,e:
         mylog.error('second_check:{}'.format(e))
+    # Storm suppression
+    mylog.info("start Storm suppression!")
+    warnLis=blacklist_tools.get_global_value('warn')
+    if(warnLis==None):
+        mylog.error('global name error!')
+        subWarn={}
+    else:
+        # get warnLis size
+        lisSize=parser_config.get_WarnLis_size()
+        if(len(warnLis)==0):
+            warnLis.append(allwarn)
+            subWarn=allwarn
+        elif(len(warnLis)<lisSize):
+            subWarn=list_filter(warnLis,allwarn)
+            warnLis.append(subWarn)
+        elif(len(warnLis)==lisSize):
+            subWarn = list_filter(warnLis, allwarn)
+            warnLis.pop(0)
+            warnLis.append(subWarn)
+
     #insert warning alert
     try:
-        searchAndInsert(all_IP,allwarn,es,mylog)
+        searchAndInsert(all_IP,subWarn,es,mylog)
     except Exception,e:
         mylog.error('searchAndInsert:{}'.format(e))

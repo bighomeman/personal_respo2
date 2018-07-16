@@ -44,9 +44,11 @@ def getCheckDeltatime():
     timekey1=cp.options("delta_time_check")
     times=cp.getint("delta_time_check",timekey1[0])
     deltatime=datetime.timedelta(minutes=times)
+    sec=cp.getint("delta_time_check",timekey1[1])
+    offset=datetime.timedelta(seconds=sec)
     timekey2=cp.options("frequency")
     starttime=cp.get("frequency",timekey2[0])
-    return deltatime,starttime
+    return deltatime,starttime,offset
 
 def get_module_path():
     #source_data_path
@@ -87,6 +89,19 @@ def get_ip_secondcheck():
     ipSecondCheckC2 = cp.getint('ip_second_check', source_store_path_key[0])
     return ipSecondCheckC2
 
+def get_WarnLis_size():
+    # get subnet method
+    source_store_path_key = cp.options("warnLis_size")
+    # value=cp.get(sectionName,keyword)
+    lis_size = cp.getint('warnLis_size', source_store_path_key[0])
+    return lis_size
+
+def update_flg():
+    # get subnet method
+    source_store_path_key = cp.options("update_flg")
+    # value=cp.get(sectionName,keyword)
+    flg = cp.getint('update_flg', source_store_path_key[0])
+    return flg
 # print cp.sections
 #cun period
 #############################################################################################################################

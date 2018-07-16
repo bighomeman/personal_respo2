@@ -188,3 +188,15 @@ def load_blacklist(blackpath):
 	else:
 		mylog.info('no blacklist path!')
 	return datadic
+
+#global module
+def global_init():
+	global _global_dic
+	_global_dic={}
+def set_global_value(name,value):
+	_global_dic[name]=value
+def get_global_value(name):
+	try:
+		return _global_dic[name]
+	except Exception,e:
+		return None

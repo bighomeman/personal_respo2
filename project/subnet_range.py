@@ -34,6 +34,7 @@ def ip_split_num(ip):
 
 def subnet_to_binary(num):
     nm_binary = num*'1'+(32-num)*'0'
+    #socket.inet_ntoa(struct.pack('I',socket.ntohl(int(nm_binary,2)))).split('.')  -> nm_num
     nm_num = []
     for i in range(4):
         temp =  nm_binary[8*(i):8*(i+1)]
@@ -144,6 +145,7 @@ def subnet_lpm(subnet,es_ip):
             saveToJSON(newlpmdict1, fpath, 'gte24_subnet')
         else:
             saveToJSON(sn_gte24,fpath,'gte24_subnet')
+    sn_gte24 = dict(sn_gte24, **sndict)  # merge
     #match
     subnet_result=[]
     for ips in es_ip:
@@ -163,15 +165,32 @@ def subnet_range_match(sn_gte24,es_ip):
     #secondly, match
     mylog=blacklist_tools.getlog()
     mylog.info('gte24 size:{}'.format(len(sn_gte24)))
+    # sorted
+    newAllRange=sorted(allrange.iteritems(),key=lambda x:x[1][0])
+    rangeLen=len(newAllRange)
+    mylog.info('start Binary Search!')
     for ips in es_ip:
         ip_es_num = socket.ntohl(struct.unpack("I",socket.inet_aton(str(ips)))[0])
-        for key in allrange.keys():
-            subnet_num = allrange[key]
-            # print subnet_num[0],subnet_num[1]
-            subnet_num_min = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[0])))[0])
-            subnet_num_max = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[1])))[0])
-            if subnet_num_min <= ip_es_num <= subnet_num_max:
-                sn_gte24_list.append({ips:key})
+        # Binary Search
+        nlow=0
+        nhigh=rangeLen-1
+        while(nlow<=nhigh):
+            nmid=(nlow+nhigh)/2
+            subnet_num=newAllRange[nmid][1]# [start,end]
+            if(subnet_num[0]<=ip_es_num<=subnet_num[1]):
+                sn_gte24_list.append({ips: newAllRange[nmid][0]})
+                break
+            elif(subnet_num[0]>ip_es_num):
+                nhigh=nmid-1
+            elif(subnet_num[1]<ip_es_num):
+                nlow=nmid+1
+        # for key in allrange.keys():
+        #     subnet_num = allrange[key]
+        #     # print subnet_num[0],subnet_num[1]
+        #     subnet_num_min = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[0])))[0])
+        #     subnet_num_max = socket.ntohl(struct.unpack("I",socket.inet_aton(str(subnet_num[1])))[0])
+        #     if subnet_num[0] <= ip_es_num <= subnet_num[1]:
+        #         sn_gte24_list.append({ips:key})
         # for key in sn_lte16:#key is ip
         #     subnet_num = subnet_range(key)
         #     # print subnet_num[0],subnet_num[1]
@@ -202,8 +221,10 @@ def subnet_range(subnet):
         lastadr.append(str(ip_num[3] | (~ nm_num[3] & 0xff)))
         begin_addr = '.'.join(firstadr)
         end_addr = '.'.join(lastadr)
-        ip_range.append(begin_addr)
-        ip_range.append(end_addr)
+        begin_int=socket.ntohl(struct.unpack("I",socket.inet_aton(begin_addr))[0])
+        end_int = socket.ntohl(struct.unpack("I", socket.inet_aton(end_addr))[0])
+        ip_range.append(begin_int)
+        ip_range.append(end_int)
 
     elif netMask == 32:
         firstadr.append(str(ip_num[0]))
@@ -217,8 +238,10 @@ def subnet_range(subnet):
         lastadr.append(str(ip_num[3]))
         begin_addr = '.'.join(firstadr)
         end_addr = '.'.join(lastadr)
-        ip_range.append(begin_addr)
-        ip_range.append(end_addr)
+        begin_int=socket.ntohl(struct.unpack("I",socket.inet_aton(begin_addr))[0])
+        end_int = socket.ntohl(struct.unpack("I", socket.inet_aton(end_addr))[0])
+        ip_range.append(begin_int)
+        ip_range.append(end_int)
     else:
         lastadr.append(str(ip_num[0] | (~ nm_num[0] & 0xff)))
         lastadr.append(str(ip_num[1] | (~ nm_num[1] & 0xff)))
@@ -231,8 +254,10 @@ def subnet_range(subnet):
         firstadr.append(str((ip_num[3] & nm_num[3])+1))
         begin_addr = '.'.join(firstadr)
         end_addr = '.'.join(lastadr)
-        ip_range.append(begin_addr)
-        ip_range.append(end_addr)
+        begin_int=socket.ntohl(struct.unpack("I",socket.inet_aton(begin_addr))[0])
+        end_int = socket.ntohl(struct.unpack("I", socket.inet_aton(end_addr))[0])
+        ip_range.append(begin_int)
+        ip_range.append(end_int)
 
     return ip_range
 
