@@ -19,6 +19,7 @@ def bitnodes(mylog):
         neir_json = json.loads(neir)
     except Exception, e:
         mylog.error('load json ERROR')
+        neir_json={}
     if neir_json:
         result = neir_json['nodes'].keys()
     else:
