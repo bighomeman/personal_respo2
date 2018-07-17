@@ -27,12 +27,14 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 <br>————subnet_range.py：IP子网段处理函数文件
 <br>————treat_ip.py：IP操作处理函数文件
 <br>————update_blacklist.py：更新网络情报源函数文件
+<br>————ip_check_C2.py：二次检查处理文件
 <br>
 2.运行前，对blacklist_match.conf文件进行配置参数的修改：
-<br>2.1 修改[frequency]下的sharttime，表示开始检查时间；
+<br>2.1 修改[frequency]下的starttime，表示开始检查时间；
 <br>2.2 修改[ES_info]下对应的server/dport信息；
 <br>2.3 若需启动本地黑名单，请在[self_blacklist_path]下令blacklist_flg=1，path对应于本地黑名单的默认目录；
 白名单和默认情报源的启动设置与黑名单一致。
+<br>2.4 无网络情况下，请设置[update_flg]下updateFlg=0，以便关闭更新功能。
 <br>
 <br>3.安装完成对应python版本以及依赖包后，进入/project目录下使用以下命令启动程序：
 <br>nohup python ontime_run.py & 
