@@ -269,6 +269,8 @@ def searchAndInsert(alerts,ipdict,es,mylog):
     mylog.info('second check insert finished.')
 
 def list_filter(wlis,allwarn):
+    # wlis is Queue,[{},{},{},...]
+    # allwarn is new check records
     # return subwarn which (sip,dip) not in wlis
     # first step: get (sip,dip) list
     warnlis=[]
@@ -324,7 +326,7 @@ def main(startTime,all_IP,serverNum,dport):
         mylog.error('second_check:{}'.format(e))
     # Storm suppression
     mylog.info("start Storm suppression!")
-    warnLis=blacklist_tools.get_global_value('warn')
+    warnLis=blacklist_tools.get_global_value('warn')# insert records
     if(warnLis==None):
         mylog.error('global name error!')
         subWarn={}
