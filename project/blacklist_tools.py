@@ -180,7 +180,7 @@ def load_blacklist(blackpath):
 						datadic[linelis[0]]={
 							'subtype': linelis[1],
 							'desc_subtype': '{} ip;source:{}'.format(linelis[1],linelis[2]),
-							'level': 'INFO',
+							'level': 'info',
 							'mapping_ip': linelis[0],
 						}
 		except Exception,e:
