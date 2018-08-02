@@ -212,7 +212,8 @@ class ESclient(object):
             allrecord[dip]=temp["_source"]
         return allrecord
 
-    def check_5mins(self,gte1,lte,time_zone,dip,aggs,mylog):
+    def check_5mins(self,gte1,lte,time_zone,dip,mylog):
+        #self,gte1,lte,time_zone,dip,mylog
         search_option = {
             "size": 0,
             "query": {
