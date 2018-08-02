@@ -214,6 +214,7 @@ class ESclient(object):
 
     def check_5mins(self,gte1,lte,time_zone,dip,mylog):
         #self,gte1,lte,time_zone,dip,mylog
+        mylog.info('start check sip in last 5mins,dip:{0}'.format(dip))
         search_option = {
             "size": 0,
             "query": {
@@ -248,7 +249,7 @@ class ESclient(object):
                         "field": "sip",
                         "size": 1000,
                         "order": {
-                            "flow": "desc"
+                            "_count": "desc"
                         }
                     }
                 }
@@ -270,7 +271,7 @@ class ESclient(object):
     def secondcheck(self,gte1,gte2,lte,time_zone,dip,mylog):
         mylog.info('start second check.')
         # check sip，dip in last 5 mins
-        siplis=self.check_5mins(self,gte1,lte,time_zone,dip,mylog)
+        siplis=self.check_5mins(gte1,lte,time_zone,dip,mylog)
         # check sip，dip in last 24h
         return Second_check(self.__es_client, gte2, lte, time_zone, dip,mylog,siplis)
 
