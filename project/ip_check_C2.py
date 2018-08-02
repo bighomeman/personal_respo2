@@ -260,7 +260,7 @@ class ESclient(object):
             body=search_option
         )
         allrecord=[]
-        mylog.info('get last 5mins sip.')
+        # mylog.info('get last 5mins sip.')
         clean_search_result = search_result['aggregations']["sip"]['buckets']
         for temp in clean_search_result:
             #temp is dict
