@@ -93,8 +93,8 @@ xf.start(1,lists)
 ```
  #start(stype,values,checkflg=1)为程序入口;<br>
  #params: <br>
-   stype取值为1或2，1表示检查的对象lists是IP；2表示lists是url；<br>
-   values表示IP或url的列表；<br>
+   stype取值为1或2，1表示检查的对象values是IP列表；2表示values是url列表；<br>
+   values表示具体的IP或url的列表；<br>
    checkflg默认值为1，表示写入文件；若赋值为0，则表示不写入文件；<br>
  #return:<br>
    final_dic ：字典形式返回，查询的内容为key，其他属性值为value<br>
