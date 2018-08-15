@@ -6,7 +6,6 @@ update each blacklist , each them in different file.
 step1 : create a daily dir
 step2 : save or update each blacklist
 '''
-import blacklist_tools
 import os
 import parser_config
 import time

@@ -95,7 +95,11 @@ def temp_store(dict,name):
 	'''
 	保存为json
 	'''
-	file_name = name+ '.json'
+	tmp=name[-5:]
+	if(tmp=='.json'):
+		file_name=name
+	else:
+		file_name = name+ '.json'
 	try:
 		with open(file_name,'w') as f:
 			f.write(json.dumps(dict))
