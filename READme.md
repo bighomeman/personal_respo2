@@ -87,9 +87,9 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
  #start(stype,values,checkflg=1)为程序入口;
 
  #params: 
- #  stype取值为1或2，1表示检查的对象lists是IP；2表示lists是url；
- #	values表示IP或url的列表；
- #	checkflg默认值为1，表示写入文件；若赋值为0，则表示不写入文件；
+   stype取值为1或2，1表示检查的对象lists是IP；2表示lists是url；
+   values表示IP或url的列表；
+   checkflg默认值为1，表示写入文件；若赋值为0，则表示不写入文件；
  #return:
  #	final_dic ：字典形式返回，查询的内容为key，其他属性值为value
  xf.start(1,lists)
