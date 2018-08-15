@@ -81,9 +81,8 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 <br>5.1 主要文件： check_XForce.py
 <br>
 5.2 调用方法：
-
-import check_XForce as xf
-
+import check_XForce as xf<br>
+xf.start(1,lists)<br>
  #start(stype,values,checkflg=1)为程序入口;
 
  #params: <br>
@@ -92,31 +91,29 @@ import check_XForce as xf
    checkflg默认值为1，表示写入文件；若赋值为0，则表示不写入文件；<br>
  #return:
    final_dic ：字典形式返回，查询的内容为key，其他属性值为value<br>
-
- xf.start(1,lists)
  <br>
  #example for return：<br>
  `{
-    "198.54.117.200": {
-        "company": "NAMECHEAP-NET - Namecheap, Inc., US", 
-        "cats": {
-            "Botnet Command and Control Server": 43, 
-            "Malware": 43, 
-            "Anonymisation Services": 43
-        }, 
-        "geo": "United States", 
-        "score": 4.3, 
-        "asns": "22612"
-    }, 
-    "197.210.23.55": {
-        "cats": {
-            "Dynamic IPs": 71
-        }, 
-        "company": "VCG-AS, NG", 
-        "score": 1, 
-        "geo": "Nigeria", 
-        "asns": "29465"
-    }
+	"198.54.117.200": {
+		"company": "NAMECHEAP-NET - Namecheap, Inc., US", 
+        	"cats": {
+            		"Botnet Command and Control Server": 43, 
+            		"Malware": 43, 
+            		"Anonymisation Services": 43
+        	}, 
+        	"geo": "United States", 
+        	"score": 4.3, 
+        	"asns": "22612"
+    	}, 
+    	"197.210.23.55": {
+        	"cats": {
+            		"Dynamic IPs": 71
+        	}, 
+        	"company": "VCG-AS, NG", 
+        	"score": 1, 
+        	"geo": "Nigeria", 
+        	"asns": "29465"
+    	}
 }`
 <br>5.3 更多参数以及注释请见代码文件check_XForce.py
 <br>
