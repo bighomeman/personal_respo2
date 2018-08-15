@@ -10,9 +10,9 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 ## 下载
 1. GitHub主页上使用zip打包下载得personal_respo2-master.zip，解压后得personal_respo2文件夹；或使用git clone 命令直接下载。主要的文件目录形式如下：
 <br>personal_respo2:
-<br>——project：程序主文件目录
-<br>————data: 程序数据存放目录
-<br>——————log：日志文件目录
+<br>|——project：程序主文件目录
+<br>    |——data: 程序数据存放目录
+<br>        |——log：日志文件目录
 <br>——————self_blacklist：本地黑名单文件目录
 <br>——————self_defaultlist：本地默认情报源目录
 <br>——————self_whitelist：本地白名单文件目录
