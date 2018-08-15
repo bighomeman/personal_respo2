@@ -22,13 +22,15 @@ personal_respo2:
 	|——  ......
     |——lpm: 				lpm算法集成目录
     |——blacklist_match.conf：		程序配置文件
-    |——blacklist_tools：		程序公共函数方法文件
+    |——blacklist_tools.py：		程序公共函数方法文件
+    |——update_blacklist.py：		更新黑名单文件
     |——match_insert.py：		匹配以及插入ES操作文件
     |——ontime_run.py：			主运行程序
     |——parser_config.py：		配置文件操作函数文件
     |——subnet_range.py：		IP子网段处理函数文件
     |——treat_ip.py：			IP操作处理函数文件
     |——ip_check_C2.py：			二次检查处理文件
+    |——check_XForce.py：			获取xforce信息文件
 ```
 ## 运行
 2.运行前，对blacklist_match.conf文件进行配置参数的修改：
