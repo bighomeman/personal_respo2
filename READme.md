@@ -1,5 +1,5 @@
 # personal_respo2
-前言<br>
+# 前言<br>
 本程序用于获取网络情报，针对imap中记录的目的ip地址进行检查，若目的ip与情报中出现的ip匹配，则发出告警信息，并将告警信息写入ES中。<br>
 
 本程序需在Linux环境下运行，基于python 2.7语法规范编写，主要的相关依赖包如下：
@@ -7,6 +7,7 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 <br>
 本程序GitHub地址为：https://github.com/sh9369/personal_respo2
 <br>
+## 下载
 1. GitHub主页上使用zip打包下载得personal_respo2-master.zip，解压后得personal_respo2文件夹；或使用git clone 命令直接下载。主要的文件目录形式如下：
 <br>personal_respo2:
 <br>——project：程序主文件目录
@@ -29,6 +30,7 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 <br>————update_blacklist.py：更新网络情报源函数文件
 <br>————ip_check_C2.py：二次检查处理文件
 <br>
+## 运行
 2.运行前，对blacklist_match.conf文件进行配置参数的修改：
 <br>2.1 修改[frequency]下的starttime，表示开始检查时间；
 <br>2.2 修改[ES_info]下对应的server/dport信息；
@@ -44,6 +46,7 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 <br>日志文件会记录程序运行中的相关信息，当看到日志文件不断写入内容后表示程序已经运行。
 <br>
 <br>
+## 增加情报源
 4.增加网络情报源的方法
 <br>4.1 在/get_blacklist目录下新建一个处理文件，假设为XXX.py；
 <br>
@@ -77,12 +80,15 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 <br>4.3 确定网络情报数据源的更新频率，在blacklist_match.conf文件中[parse_blacklist]下的fun1末尾添加“,XXX:frequency"
 <br>
 <br>
+## XForce信息
 5.获取XForce 信息：
 <br>5.1 主要文件： check_XForce.py
 <br>
 5.2 调用方法：<br>
-import check_XForce as xf<br>
-xf.start(1,lists)<br>
+```
+import check_XForce as xf
+xf.start(1,lists)
+```
  #start(stype,values,checkflg=1)为程序入口;<br>
  #params: <br>
    stype取值为1或2，1表示检查的对象lists是IP；2表示lists是url；<br>
@@ -91,8 +97,8 @@ xf.start(1,lists)<br>
  #return:<br>
    final_dic ：字典形式返回，查询的内容为key，其他属性值为value<br>
  #example for return：
-
-`{
+```
+{
 	"198.54.117.200": {
 		"company": "NAMECHEAP-NET - Namecheap, Inc., US", 
         	"cats": {
@@ -113,6 +119,7 @@ xf.start(1,lists)<br>
         	"geo": "Nigeria", 
         	"asns": "29465"
     	}
-}`
+}
+```
 <br>5.3 更多参数以及注释请见代码文件check_XForce.py
 <br>
