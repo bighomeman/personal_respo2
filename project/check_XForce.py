@@ -131,6 +131,9 @@ def get_info(host,type,value):
 def start(stype,values,checkflg=1):
     # 程序入口， checkflg表示是否检查和写入本地文件，默认值为1表示检查和写入。
     final_dic = {}# return
+    if(not type(values)==list):# values is not list
+        print 'values type error!'
+        return final_dic
     # first step: check the local file
     if(checkflg==1):
         # load data from local file
@@ -167,8 +170,8 @@ def start(stype,values,checkflg=1):
 
 if __name__ == '__main__':
     # for examples:
-    stype=1
-    value=['198.54.117.200','197.210.23.55']
-    # stype=2
-    # value=["urlhaus.abuse.ch/browse/"]
+    # stype=1
+    # value=['198.54.117.200','197.210.23.55']
+    stype=2
+    value="urlhaus.abuse.ch/browse/"
     start(stype,value)
