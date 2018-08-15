@@ -91,10 +91,11 @@ import check_XForce as xf
    values表示IP或url的列表；<br>
    checkflg默认值为1，表示写入文件；若赋值为0，则表示不写入文件；<br>
  #return:
-   final_dic ：字典形式返回，查询的内容为key，其他属性值为value
+   final_dic ：字典形式返回，查询的内容为key，其他属性值为value<br>
+
  xf.start(1,lists)
- 
- #example for return：
+ <br>
+ #example for return：<br>
  `{
     "198.54.117.200": {
         "company": "NAMECHEAP-NET - Namecheap, Inc., US", 
