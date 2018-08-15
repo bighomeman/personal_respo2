@@ -80,11 +80,10 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 5.获取XForce 信息：
 <br>5.1 主要文件： check_XForce.py
 <br>
-5.2 调用方法：
+5.2 调用方法：<br>
 import check_XForce as xf<br>
 xf.start(1,lists)<br>
- #start(stype,values,checkflg=1)为程序入口;
-
+ #start(stype,values,checkflg=1)为程序入口;<br>
  #params: <br>
    stype取值为1或2，1表示检查的对象lists是IP；2表示lists是url；<br>
    values表示IP或url的列表；<br>
@@ -92,7 +91,8 @@ xf.start(1,lists)<br>
  #return:
    final_dic ：字典形式返回，查询的内容为key，其他属性值为value<br>
  <br>
- #example for return：<br>
+ #example for return：
+
  `{
 	"198.54.117.200": {
 		"company": "NAMECHEAP-NET - Namecheap, Inc., US", 
