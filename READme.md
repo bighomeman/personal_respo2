@@ -82,20 +82,20 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 <br>
 5.2 调用方法：
 
-`import check_XForce as xf
+import check_XForce as xf
 
  #start(stype,values,checkflg=1)为程序入口;
 
- #params: 
-   stype取值为1或2，1表示检查的对象lists是IP；2表示lists是url；
-   values表示IP或url的列表；
-   checkflg默认值为1，表示写入文件；若赋值为0，则表示不写入文件；
+ #params: <br>
+   stype取值为1或2，1表示检查的对象lists是IP；2表示lists是url；<br>
+   values表示IP或url的列表；<br>
+   checkflg默认值为1，表示写入文件；若赋值为0，则表示不写入文件；<br>
  #return:
- #	final_dic ：字典形式返回，查询的内容为key，其他属性值为value
+   final_dic ：字典形式返回，查询的内容为key，其他属性值为value
  xf.start(1,lists)
  
- # example for return：
- {
+ #example for return：
+ `{
     "198.54.117.200": {
         "company": "NAMECHEAP-NET - Namecheap, Inc., US", 
         "cats": {
@@ -116,8 +116,6 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
         "geo": "Nigeria", 
         "asns": "29465"
     }
-}
-
-`
+}`
 <br>5.3 更多参数以及注释请见代码文件check_XForce.py
 <br>
