@@ -9,27 +9,27 @@ json、logging、datetime、time、elasticsearch、ConfigParser、socket、struct、re、
 <br>
 ## 下载
 1. GitHub主页上使用zip打包下载得personal_respo2-master.zip，解压后得personal_respo2文件夹；或使用git clone 命令直接下载。主要的文件目录形式如下：
-<br>personal_respo2:
-<br>|——project：程序主文件目录
-<br>    |——data: 程序数据存放目录
-<br>        |——log：日志文件目录
-<br>——————self_blacklist：本地黑名单文件目录
-<br>——————self_defaultlist：本地默认情报源目录
-<br>——————self_whitelist：本地白名单文件目录
-<br>————get_blacklist：网络情报源处理文件存放目录
-<br>——————MiningServerIPList.py：具体处理网络情报的文件
-<br>——————  ......
-<br>————lpm: lpm算法集成目录
-<br>————blacklist_match.conf：程序配置文件
-<br>————blacklist_tools：程序公共函数方法文件
-<br>————match_insert.py：匹配以及插入ES操作文件
-<br>————ontime_run.py：主运行程序
-<br>————parser_config.py：配置文件操作函数文件
-<br>————subnet_range.py：IP子网段处理函数文件
-<br>————treat_ip.py：IP操作处理函数文件
-<br>————update_blacklist.py：更新网络情报源函数文件
-<br>————ip_check_C2.py：二次检查处理文件
-<br>
+```
+personal_respo2:
+|——project：				程序主文件目录
+    |——data: 				程序数据存放目录
+        |——log：			日志文件目录
+	|——self_blacklist：		本地黑名单文件目录
+	|——self_defaultlist：		本地默认情报源目录
+	|——self_whitelist：		本地白名单文件目录
+    |——get_blacklist：		网络情报源处理文件存放目录
+	|——MiningServerIPList.py：	具体处理网络情报的文件
+	|——  ......
+    |——lpm: 				lpm算法集成目录
+    |——blacklist_match.conf：		程序配置文件
+    |——blacklist_tools：		程序公共函数方法文件
+    |——match_insert.py：		匹配以及插入ES操作文件
+    |——ontime_run.py：		主运行程序
+    |——parser_config.py：		配置文件操作函数文件
+    |——subnet_range.py：		IP子网段处理函数文件
+    |——treat_ip.py：			IP操作处理函数文件
+    |——ip_check_C2.py：		二次检查处理文件
+```
 ## 运行
 2.运行前，对blacklist_match.conf文件进行配置参数的修改：
 <br>2.1 修改[frequency]下的starttime，表示开始检查时间；
