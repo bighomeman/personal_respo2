@@ -44,8 +44,8 @@ def MiningServerIPList(mylog):
     return ip_dict
 
 def main():
-    # mylog=blacklist_tools.getlog()
-    mylog=[]
+    mylog=blacklist_tools.getlog()
+    # mylog=[]
     dict = MiningServerIPList(mylog)
     print len(dict.keys())
     store_json(dict, 'MiningServerIPList')
