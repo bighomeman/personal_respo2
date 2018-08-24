@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import requests
+import requests,datetime
 from store_json import store_json
 from lxml import etree
 from project import blacklist_tools
@@ -10,14 +10,21 @@ from project import blacklist_tools
 def MiningServerIPList(mylog):
     requests.adapters.DEFAULT_RETRIES = 5
     try:
-        http = requests.get('https://github.com/ZeroDot1/CoinBlockerLists/blob/master/MiningServerIPList.txt',verify=False,timeout=120)
+        http = requests.get('https://zerodot1.gitlab.io/CoinBlockerLists/MiningServerIPList.txt',verify=False,timeout=120)
         neir = http.text
-        html = etree.HTML(neir)
-        result = html.xpath('//td[starts-with(@id,"LC")]/text()')
-        time_source = result[4]
-        time_mediate =time_source.split(' ')
-        date = time_mediate[5]+'-'+time_mediate[4]+'-'+time_mediate[3]
-        del result[:7]
+        result=neir.split('\n')
+        for line in result:
+            if('#' in line and 'Last modified' in line):
+                timelist=line.split(':')
+                date=timelist[1].strip()+':'+timelist[2].strip()
+                break
+                # date=datetime.datetime.strftime(tmpdate,'%Y-%m-%d %H:%M')
+        # html = etree.HTML(neir)
+        # result = html.xpath('//td[starts-with(@id,"LC")]/text()')
+        # time_source = result[4]
+        # time_mediate =time_source.split(' ')
+        # date = time_mediate[5]+'-'+time_mediate[4]+'-'+time_mediate[3]
+        del result[:8]
     except Exception,e:
         mylog.warning("download timeout!!!")
         result=[]
@@ -26,7 +33,7 @@ def MiningServerIPList(mylog):
     for ip in result:
         ip_dict[ip] ={
             'subtype':'mining',
-            'desc_subtype':'mining pool ip;source:github.com/ZeroDot1/CoinBlockerLists/blob/master/MiningServerIPList',
+            'desc_subtype':'mining pool ip;source:zerodot1.gitlab.io/CoinBlockerLists/MiningServerIPList.txt',
             'level':'info',
             'fp':'unknown',
             'status':'unknown',
@@ -37,7 +44,8 @@ def MiningServerIPList(mylog):
     return ip_dict
 
 def main():
-    mylog=blacklist_tools.getlog()
+    # mylog=blacklist_tools.getlog()
+    mylog=[]
     dict = MiningServerIPList(mylog)
     print len(dict.keys())
     store_json(dict, 'MiningServerIPList')
