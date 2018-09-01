@@ -269,7 +269,7 @@ class ESclient(object):
         return allrecord
 
     def secondcheck(self,gte1,gte2,lte,time_zone,dip,mylog):
-        mylog.info('start second check.')
+        mylog.info('[start second check.]')
         # check sip，dip in last 5 mins
         siplis=self.check_5mins(gte1,lte,time_zone,dip,mylog)
         # check sip，dip in last 24h
@@ -386,7 +386,7 @@ def main(startTime,all_IP,serverNum,dport):
     except Exception,e:
         mylog.error('second_check:{}'.format(e))
     # Storm suppression
-    mylog.info("start Storm suppression!")
+    mylog.info("[start Storm suppression!]")
     warnLis=blacklist_tools.get_global_value('warn')# insert records
     if(warnLis==None):
         mylog.error('global name error!')

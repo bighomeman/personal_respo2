@@ -6,9 +6,9 @@ this file constructs a function to get infomation from IBM X-Force
 '''
 from requests.auth import HTTPBasicAuth
 import time,requests
-import urllib2
-from bs4 import BeautifulSoup as bs
-from selenium import webdriver
+# import urllib2
+# from bs4 import BeautifulSoup as bs
+# from selenium import webdriver
 import blacklist_tools
 import os,datetime
 import json
@@ -162,7 +162,7 @@ def start(stype,values,checkflg=1):
         ldic=dict(ldic,**tmp_dic)
         # save
         blacklist_tools.temp_store(ldic,fpath)
-    #merge
+    #merge result
     final_dic=dict(final_dic,**tmp_dic)
     print json.dumps(final_dic,indent=4)
     return final_dic
@@ -170,8 +170,8 @@ def start(stype,values,checkflg=1):
 
 if __name__ == '__main__':
     # for examples:
-    # stype=1
-    # value=['198.54.117.200','197.210.23.55']
-    stype=2
-    value="urlhaus.abuse.ch/browse/"
+    stype=1
+    value=['151.237.176.222','198.54.117.200']
+    # stype=2
+    # value=["asfdaon.com"]
     start(stype,value)

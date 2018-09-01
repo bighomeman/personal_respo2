@@ -85,9 +85,9 @@ def int_ip_range(segment,es_ip):
     #match
     segment_match=[]
     for ip_str in es_ip:
-        flg=ip_segment_match(ip_int, ip_str)
+        flg=ip_segment_match(ip_int, ip_str)# flg={ip:range} or False
         if(flg):
-            segment_match.append(flg)
+            segment_match.append(flg) # segment_match=[{ip,range},{},{}...]
     return segment_match
 
 #only for subnet number range

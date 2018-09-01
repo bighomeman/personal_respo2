@@ -11,6 +11,7 @@ import parser_config
 import os
 import lpm
 import subnet_range
+import check_XForce as xf
 
 class ESclient(object):
 	def __init__(self,server='192.168.0.122',port='9222'):
@@ -91,7 +92,7 @@ step3: range match
 step4: separate the subnet dataset into two parts(lpm,full)
 step5: lpm match and subnet full match
 '''
-def treatip(dataset,es_ip):
+def treatip(dataset,es_ip):# dataset is blacklist or whitelist
     mylog=blacklist_tools.getlog()
     full,segment,subnet=treat_ip.separate_ip(dataset)#dataset is dict
     # match procedure
@@ -140,98 +141,197 @@ def treatip(dataset,es_ip):
     # return match results
     return fullmatchlist,segmentlist,subnet_lpm,subnet_full
 
+# check x-force
+def get_xforce(odata,datatype = 0):
+    # datatype=1 means odata is fullmatch data
+    mylog = blacklist_tools.getlog()
+    mylog.info('start get_xforce!')
+    if(datatype==1):
+        # fullmatch data =[ip,ip,ip...]
+        retdata=xf.start(1,odata)
+    else:
+        # other data = [{ip:matchtype},{},{},...]
+        ipset=[]
+        for ii in odata:
+            ipset.append(ii.keys()[0])
+        retdata=xf.start(1,ipset)
+    # retdata is dict of xforce info
+    mylog.info('finish get_xforce')
+    return retdata
+
+# 将full match格式插入es
+def full_match_type(es_insert,data,msg,index,timestamp,aggs_name):
+    mylog=blacklist_tools.getlog()
+    tmpThreat={}
+    # check by x-force
+    try:
+        new_fullmatch = get_xforce(data, 1)
+        # new_fullmatch_list=new_fullmatch.keys()
+        for i in range(len(data)):
+            doc = {}
+            doc['level'] = msg[data[i]]['level']
+            doc['type'] = 'mal_ip'
+            doc['desc_type'] = '[mal_ip] Request of suspect IP detection.'
+            doc['desc_subtype'] = msg[data[i]]['desc_subtype']
+            doc['subtype'] = msg[data[i]]['subtype']
+            doc['match_type'] = "full_match"
+            doc[aggs_name] = data[i]
+            doc['@timestamp'] = timestamp
+            doc['index'] = index
+            # mylog.info('msg start{0}'.format(new_fullmatch[fullmatch[i]]))
+            # =========排查空值！==============
+            if (new_fullmatch[data[i]].has_key('score') and (new_fullmatch[data[i]]["score"]) and int(new_fullmatch[data[i]]["score"]) >= 4.3):
+                doc['level'] = 'warn'
+                doc['xforce_marks'] = int(new_fullmatch[data[i]]["score"])
+            elif ((not new_fullmatch[data[i]].has_key('score')) or (not (new_fullmatch[data[i]]["score"]))):
+                doc['xforce_marks'] = 0
+            else:
+                doc['xforce_marks'] = int(new_fullmatch[data[i]]["score"])
+            # msg info
+            msg_info = ''
+            if(new_fullmatch[data[i]].has_key("cats")):
+                cats = new_fullmatch[data[i]]["cats"]
+                for ky, vals in cats.items():
+                    msg_info = msg_info + str(ky) + ':' + str(vals) + '%;'
+            if (new_fullmatch[data[i]].has_key("geo") and (new_fullmatch[data[i]]["geo"]).strip()):
+                msg_info = msg_info + 'geo:' + new_fullmatch[data[i]]["geo"] + ';'
+            if (new_fullmatch[data[i]].has_key("company") and (new_fullmatch[data[i]]["company"]).strip()):
+                msg_info = msg_info + 'company:' + new_fullmatch[data[i]]["company"]
+            if(msg_info[-1]==';'):
+                doc['xforce_msg'] = msg_info[:-1]
+            else:
+                doc['xforce_msg'] = msg_info
+            es_insert.es_index(doc)
+            tmpThreat[data[i]] = doc
+        mylog.info('insert fullmatch with xforce')
+    except Exception, e:
+        mylog.error(e)
+        for i in range(len(data)):
+            doc = {}
+            doc['level'] = msg[data[i]]['level']
+            doc['type'] = 'mal_ip'
+            doc['desc_type'] = '[mal_ip] Request of suspect IP detection.'
+            doc['desc_subtype'] = msg[data[i]]['desc_subtype']
+            doc['subtype'] = msg[data[i]]['subtype']
+            doc['match_type'] = "full_match"
+            doc[aggs_name] = data[i]
+            doc['@timestamp'] = timestamp
+            doc['index'] = index
+            es_insert.es_index(doc)
+            tmpThreat[data[i]] = doc
+        # print 'full_match_insert'
+        mylog.info('insert fullmatch by defaut')
+    return tmpThreat
+
+# 将lpm,range格式统一插入es
+# data format: [{ip:matched_ip},{},{},...]
+def other_match_type(es_insert,data,match_types,msg,index,timestamp,aggs_name):
+    mylog=blacklist_tools.getlog()
+    tmpThreat={}
+    # check by x-force
+    try:
+        new_subnetlpm = get_xforce(data, 0)
+        # new_fullmatch_list=new_fullmatch.keys()
+        for i in range(len(data)):
+            doc = {}
+            # segment insert,
+            # ip_es 原es IP
+            ip_es=data[i].keys()[0]# get alert ip
+            # ip_es,对应的匹配的ip
+            ipseg=data[i][ip_es]# alert match type
+            # print ipseg
+            if(match_types == "subnet_lpm_match"):
+                #lpm找不到对应ip,随机取一个当前黑名单的ip，获取对应属性字段
+                key1=msg.keys()[0]
+                ipseg=key1
+                tmptype=msg[key1]['desc_subtype'].split(';')
+                doc['desc_subtype'] = tmptype[0].split(':')[0]+';'+tmptype[1]
+            else:
+                doc['desc_subtype'] = msg[ipseg]['desc_subtype']
+            doc['level'] = msg[ipseg]['level']
+            doc['type'] = 'mal_ip'
+            doc['desc_type'] = '[mal_ip] Request of suspect IP detection.'
+            doc['subtype'] = msg[ipseg]['subtype']
+            doc['match_type'] = match_types
+            doc[aggs_name] = ip_es
+            doc['@timestamp'] = timestamp
+            doc['index'] = index
+            if (new_subnetlpm[ip_es].has_key("score") and (new_subnetlpm[ip_es]["score"]) and int(new_subnetlpm[ip_es]["score"]) >= 4.3):
+                doc['level'] = 'warn'
+                doc['xforce_marks'] = int(new_subnetlpm[ip_es]["score"])
+            elif((not new_subnetlpm[ip_es].has_key("score")) or (not (new_subnetlpm[ip_es]["score"]))):
+                doc['xforce_marks'] = 0
+            else:
+                doc['xforce_marks'] = int(new_subnetlpm[ip_es]["score"])
+            # msg info
+            msg_info = ''
+            if(new_subnetlpm[ip_es].has_key("cats")):
+                cats = new_subnetlpm[ip_es]["cats"]
+                for ky, vals in cats.items():
+                    msg_info = msg_info + str(ky) + ':' + str(vals) + '%;'
+            if(new_subnetlpm[ip_es].has_key("geo") and (new_subnetlpm[ip_es]["geo"]).strip()):
+                msg_info = msg_info + 'geo:' + new_subnetlpm[ip_es]["geo"] + ';'
+            if(new_subnetlpm[ip_es].has_key("company") and (new_subnetlpm[ip_es]["company"]).strip()):
+                msg_info = msg_info + 'company:' + new_subnetlpm[ip_es]["company"]
+            if(msg_info[-1]==';'):
+                doc['xforce_msg'] = msg_info[:-1]
+            else:
+                doc['xforce_msg'] = msg_info
+            es_insert.es_index(doc)
+            tmpThreat[ip_es] = doc
+            mylog.info('insert {0} with xforce'.format(match_types))
+    except Exception, e:
+        mylog.error(e)
+        for i in range(len(data)):
+            doc = {}
+            # segment insert
+            ip_es=data[i].keys()[0]# get alert ip
+            # print ip_es
+            ipseg=data[i][ip_es]# alert match type
+            # print ipseg
+            if(match_types == "subnet_lpm_match"):
+                key1=msg.keys()[0]
+                ipseg=key1
+                tmptype=msg[key1]['desc_subtype'].split(';')
+                doc['desc_subtype'] = tmptype[0].split(':')[0]+';'+tmptype[1]
+            else:
+                doc['desc_subtype'] = msg[ipseg]['desc_subtype']
+            doc['level'] = msg[ipseg]['level']
+            doc['type'] = 'mal_ip'
+            doc['desc_type'] = '[mal_ip] Request of suspect IP detection.'
+            doc['subtype'] = msg[ipseg]['subtype']
+            doc['match_type'] = match_types
+            doc[aggs_name] = ip_es
+            doc['@timestamp'] = timestamp
+            doc['index'] = index
+            tmpThreat[ip_es] = doc
+            # print 'subnet_lpm_insert'
+            mylog.info('insert {0} by default'.format(match_types))
+    return tmpThreat
 
 #get four dateset from four match methods , insert separately
-# msg is original data
+# msg is original dataset
 def insert_result(index,aggs_name,timestamp,serverNum,dport,fullmatch,segmentmatch,subnetlpm,subnetfull,msg):
     es_insert = ESclient(server=serverNum, port=dport)
     mylog=blacklist_tools.getlog()
-    threat_ip={}
+    threat_ip={}# finally dict of matched ip,最终匹配成功的ip
     #white list filter ips
-    if len(fullmatch) > 0:
-        for i in range(len(fullmatch)):
-            doc = {}
-            doc['level'] = msg[fullmatch[i]]['level']
-            doc['type']='mal_ip'
-            doc['desc_type']='[mal_ip] Request of suspect IP detection.'
-            doc['desc_subtype'] = msg[fullmatch[i]]['desc_subtype']
-            doc['subtype']=msg[fullmatch[i]]['subtype']
-            doc['match_type'] = "full_match"
-            doc[aggs_name] = fullmatch[i]
-            doc['@timestamp'] = timestamp
-            doc['index'] = index
-            es_insert.es_index(doc)
-            threat_ip[fullmatch[i]]=doc
-        print 'full_match_insert'
-        mylog.info('full_match_insert')
+    if len(fullmatch) > 0:# fullmatch=[ip,ip,ip...]
+        tmp=full_match_type(es_insert,fullmatch,msg,index,timestamp,aggs_name)
+        threat_ip=dict(threat_ip,**tmp)
 
-    if len(segmentmatch) > 0:
-        for i in range(len(segmentmatch)):
-            # segment insert
-            ip_es=segmentmatch[i].keys()[0]
-            # print ip_es
-            ipseg=segmentmatch[i][ip_es]
-            # print ipseg
-            doc = {}
-            doc['level'] = msg[ipseg]['level']
-            doc['type'] = 'mal_ip'
-            doc['desc_type'] = '[mal_ip] Request of suspect IP detection.'
-            doc['desc_subtype'] = msg[ipseg]['desc_subtype']
-            doc['subtype'] = msg[ipseg]['subtype']
-            doc['match_type'] = "segment_match"
-            doc[aggs_name] = ip_es
-            doc['@timestamp'] = timestamp
-            doc['index'] = index
-            es_insert.es_index(doc)
-            threat_ip[ip_es] = doc
-        print 'segment_insert'
-        mylog.info('segment_insert')
+    if len(segmentmatch) > 0:#segmentmatch=[{ip:range},{},{}...]
+        tmp=other_match_type(es_insert,segmentmatch,"segment_match",msg,index,timestamp,aggs_name)
+        threat_ip=dict(threat_ip,**tmp)#merge
 
-    if len(subnetlpm) > 0:
-        for i in range(len(subnetlpm)):
-            # segment insert
-            ip_es=subnetlpm[i].keys()[0]
-            # print ip_es
-            ipseg=subnetlpm[i][ip_es]
-            # print ipseg
-            key1=msg.keys()[0]
-            doc = {}
-            doc['level'] = msg[key1]['level']
-            doc['type'] = 'mal_ip'
-            doc['desc_type'] = '[mal_ip] Request of suspect IP detection.'
-            tmptype=msg[key1]['desc_subtype'].split(';')
-            doc['desc_subtype'] = tmptype[0].split(':')[0]+';'+tmptype[1]
-            doc['subtype'] = msg[key1]['subtype']
-            doc['match_type'] = 'subnet_lpm_match'
-            doc[aggs_name] = ip_es
-            doc['@timestamp'] = timestamp
-            doc['index'] = index
-            es_insert.es_index(doc)
-            threat_ip[ip_es] = doc
-        print 'subnet_lpm_insert'
-        mylog.info('subnet_lpm_insert')
+    if len(subnetlpm) > 0:#subnetlpm=[{ip:"lpm_match"},{},{}...]
+        tmp=other_match_type(es_insert,subnetlpm,'subnet_lpm_match',msg,index,timestamp,aggs_name)
+        threat_ip=dict(threat_ip,**tmp)
 
-    if len(subnetfull) > 0:
-        for i in range(len(subnetfull)):
-            # segment insert
-            ip_es=subnetfull[i].keys()[0]
-            # print ip_es
-            ipseg=subnetfull[i][ip_es]
-            # print ipseg
-            doc = {}
-            doc['level'] = msg[ipseg]['level']
-            doc['type'] = 'mal_ip'
-            doc['desc_type'] = '[mal_ip] Request of suspect IP detection.'
-            doc['desc_subtype'] = msg[ipseg]['desc_subtype']
-            doc['subtype'] = msg[ipseg]['subtype']
-            doc['match_type'] = 'subnet_fullmatch'
-            doc[aggs_name] = ip_es
-            doc['@timestamp'] = timestamp
-            doc['index'] = index
-            es_insert.es_index(doc)
-            threat_ip[ip_es] = doc
-        print 'subnet_full_insert'
-        mylog.info('subnet_full_insert')
+    if len(subnetfull) > 0:# subnet_range data, subnetfull=[{ip:ipsubnet},{},{}]
+        tmp=other_match_type(es_insert,subnetfull,'subnet_fullmatch',msg,index,timestamp,aggs_name)
+        threat_ip=dict(threat_ip,**tmp)
+
     return threat_ip
 
 def checkAndInsert(path,filelist,ip_es_list,index,aggs_name,timestamp,serverNum,dport):
