@@ -111,9 +111,13 @@ def get_info(host,type,value):
     #full_url=host[:-4]
     #get html
     #get_html(full_url)
-    http = requests.get(full_url, timeout=30,auth=HTTPBasicAuth(ky,pw))
+    #  确保session使用后会关闭，减少http连接次数
+    with requests.Session() as s:
+        http = s.get(full_url, timeout=30,auth=HTTPBasicAuth(ky,pw))
+        html_json = http.json()
+    # http = requests.get(full_url, timeout=30,auth=HTTPBasicAuth(ky,pw))
     # html_txt = http.text
-    html_json=http.json()
+    # ss.keep_alive = False
     # process the json depend on type
     if(type=='ipr'):
         res=dic_ip(html_json)
@@ -171,7 +175,7 @@ def start(stype,values,checkflg=1):
 if __name__ == '__main__':
     # for examples:
     stype=1
-    value=['151.237.176.222','198.54.117.200']
+    value=['213.186.33.5','151.80.144.253']
     # stype=2
     # value=["asfdaon.com"]
     start(stype,value)
