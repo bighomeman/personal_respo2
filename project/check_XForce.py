@@ -184,7 +184,7 @@ def start(stype,values,checkflg=1):
         blacklist_tools.temp_store(ldic,fpath)
     #merge result
     final_dic=dict(final_dic,**tmp_dic)
-    print json.dumps(final_dic,indent=4)
+    #print json.dumps(final_dic,indent=4)
     return final_dic
 
 
