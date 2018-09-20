@@ -159,9 +159,25 @@ def start(stype,values,checkflg=1):
     ftype=search_type[stype]
     tmp_dic={}
     for value in outvalues:
-        resdata=get_info(host_ibm,ftype,value)# resdata is dic
-        for tmp in resdata.keys():
-            tmp_dic[tmp]=resdata[tmp]
+        try:
+            resdata=get_info(host_ibm,ftype,value)# resdata is dic
+            for tmp in resdata.keys():
+                tmp_dic[tmp]=resdata[tmp]
+        except Exception,e:
+            if("ReadTimeout" in e):
+                time.sleep(2)
+                # retry
+                try:
+                    resdata = get_info(host_ibm, ftype, value)  # resdata is dic
+                    for tmp in resdata.keys():
+                        tmp_dic[tmp] = resdata[tmp]
+                except Exception, e:
+                    print(e)
+                    continue
+            else:
+                print(e)
+                continue
+
     if(checkflg==1):#merge into local file
         ldic=dict(ldic,**tmp_dic)
         # save
