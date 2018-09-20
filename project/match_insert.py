@@ -180,13 +180,13 @@ def full_match_type(es_insert,data,msg,index,timestamp,aggs_name):
             doc['index'] = index
             # mylog.info('msg start{0}'.format(new_fullmatch[fullmatch[i]]))
             # =========排查空值！==============
-            if (new_fullmatch[data[i]].has_key('score') and (new_fullmatch[data[i]]["score"]) and int(new_fullmatch[data[i]]["score"]) >= 4.3):
+            if (new_fullmatch[data[i]].has_key('score') and (new_fullmatch[data[i]]["score"]) and float(new_fullmatch[data[i]]["score"]) >= 4.3):
                 doc['level'] = 'warn'
-                doc['xforce_marks'] = int(new_fullmatch[data[i]]["score"])
+                doc['xforce_marks'] = float(new_fullmatch[data[i]]["score"])
             elif ((not new_fullmatch[data[i]].has_key('score')) or (not (new_fullmatch[data[i]]["score"]))):
                 doc['xforce_marks'] = 0
             else:
-                doc['xforce_marks'] = int(new_fullmatch[data[i]]["score"])
+                doc['xforce_marks'] = float(new_fullmatch[data[i]]["score"])
             # msg info
             msg_info = ''
             if(new_fullmatch[data[i]].has_key("cats")):
@@ -256,13 +256,13 @@ def other_match_type(es_insert,data,match_types,msg,index,timestamp,aggs_name):
             doc[aggs_name] = ip_es
             doc['@timestamp'] = timestamp
             doc['index'] = index
-            if (new_subnetlpm[ip_es].has_key("score") and (new_subnetlpm[ip_es]["score"]) and int(new_subnetlpm[ip_es]["score"]) >= 4.3):
+            if (new_subnetlpm[ip_es].has_key("score") and (new_subnetlpm[ip_es]["score"]) and float(new_subnetlpm[ip_es]["score"]) >= 4.3):
                 doc['level'] = 'warn'
-                doc['xforce_marks'] = int(new_subnetlpm[ip_es]["score"])
+                doc['xforce_marks'] = float(new_subnetlpm[ip_es]["score"])
             elif((not new_subnetlpm[ip_es].has_key("score")) or (not (new_subnetlpm[ip_es]["score"]))):
                 doc['xforce_marks'] = 0
             else:
-                doc['xforce_marks'] = int(new_subnetlpm[ip_es]["score"])
+                doc['xforce_marks'] = float(new_subnetlpm[ip_es]["score"])
             # msg info
             msg_info = ''
             if(new_subnetlpm[ip_es].has_key("cats")):
