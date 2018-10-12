@@ -273,7 +273,7 @@ class ESclient(object):
         # check sip，dip in last 5 mins
         siplis=self.check_5mins(gte1,lte,time_zone,dip,index,mylog)
         # check sip，dip in last 24h
-        return Second_check(self.__es_client, gte2, lte, time_zone, dip,mylog,siplis)
+        return Second_check(self.__es_client, gte2, lte, time_zone, dip,index,mylog,siplis)
 
 '''
 checkAlert: 检查alert中关于c&c的info告警，获取dip
@@ -382,7 +382,7 @@ def main(startTime,all_IP,serverNum,dport,index="tcp-agg-ip-*"):
 
     try:
         for dip in all_IP.keys():
-            allwarn[dip]=es.secondcheck(gte1,gte2,lte,time_zone,dip,mylog)
+            allwarn[dip]=es.secondcheck(gte1,gte2,lte,time_zone,dip,index,mylog)
     except Exception,e:
         mylog.error('second_check:{}'.format(e))
     # Storm suppression
