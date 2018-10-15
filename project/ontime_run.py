@@ -129,7 +129,7 @@ def new_run(entertime,delta,serverNum,dport,offset,indx='tcp-*',aggs_name='dip',
             flg_C2=parser_config.get_ip_secondcheck()
             if(flg_C2==1):
                 mylog.info('all_IP size:{}'.format(len(all_IP)))
-                ip_check_C2.main(startTime,all_IP,serverNum,dport)
+                ip_check_C2.main(startTime,all_IP,serverNum,dport,indx)
             startTime = startTime + delta
             flgnum+=1
             # runtime=time.clock()-st# get the time of whole process

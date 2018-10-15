@@ -355,7 +355,7 @@ def list_filter(wlis,allwarn):
             subwarn[jj[1]].append(jj[0])
     return subwarn
 
-def main(startTime,all_IP,serverNum,dport,index="tcp-agg-ip-*"):
+def main(startTime,all_IP,serverNum,dport,index="tcp-*"):
     # all_IP is a dips inserted as an information alert into es
     mylog=blacklist_tools.getlog()
     # startTime=datetime.datetime.now()
