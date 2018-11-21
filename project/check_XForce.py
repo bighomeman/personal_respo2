@@ -184,14 +184,14 @@ def start(stype,values,checkflg=1):
         blacklist_tools.temp_store(ldic,fpath)
     #merge result
     final_dic=dict(final_dic,**tmp_dic)
-    #print json.dumps(final_dic,indent=4)
+    print json.dumps(final_dic,indent=4)
     return final_dic
 
 
 if __name__ == '__main__':
     # for examples:
-    stype=1
-    value=['213.186.33.5','151.80.144.253']
-    # stype=2
-    # value=["asfdaon.com"]
+    # stype=1
+    # value=['213.186.33.5','151.80.144.253']
+    stype=2
+    value=["binien.com"]
     start(stype,value)
